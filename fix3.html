@@ -1,73 +1,59 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix Game Text</title></head><body>
 <h2>Fix game-related text in non-game pages</h2>
-<input id="tk" placeholder="GitHub Token" style="width:400px;padding:8px">
+<input id="tk" placeholder="GitHub Token" style="width:400px;padding:8px"><br><br>
 <button onclick="run()">FIX ALL NON-GAME PAGES</button>
-<pre id="log" style="white-space:pre-wrap;font-size:12px;max-height:600px;overflow:auto"></pre>
+<pre id="log" style="white-space:pre-wrap;font-size:12px;max-height:600px;overflow:auto;margin-top:12px"></pre>
 <script>
+var REPO='zebroi/vpn-catalog';
 var gamePages=['vpn-dlya-roblox','vpn-dlya-brawl-stars','vpn-dlya-clash-royale','vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu','vpn-dlya-igr'];
 var L=document.getElementById('log');
-var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
+function lg(s){L.textContent+=s+'\n';L.scrollTop=L.scrollHeight;}
+function b64dec(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))));}
+function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
 async function run(){
 var tk=document.getElementById('tk').value.trim();
 if(!tk){alert('Enter token');return;}
-log('Fetching file list...');
-var r=await fetch('https://api.github.com/repos/zebroi/vpn-catalog/contents/',{headers:{'Authorization':'token '+tk}});
+var headers={'Authorization':'token '+tk,'Content-Type':'application/json'};
+lg('Fetching file list...');
+var r=await fetch('https://api.github.com/repos/'+REPO+'/contents/',{headers:headers});
 var files=await r.json();
-var htmlFiles=files.filter(f=>f.name.startsWith('vpn-')&&f.name.endsWith('.html'));
-log('Found '+htmlFiles.length+' vpn-* files');
+var htmlFiles=files.filter(function(f){return f.name.startsWith('vpn-')&&f.name.endsWith('.html');});
+lg('Found '+htmlFiles.length+' vpn-* files');
 var count=0;
-for(var f of htmlFiles){
+for(var i=0;i<htmlFiles.length;i++){
+var f=htmlFiles[i];
 var slug=f.name.replace('.html','');
-if(gamePages.indexOf(slug)!==-1){log('SKIP (game): '+f.name);continue;}
-log('Processing: '+f.name+'...');
-var r2=await fetch('https://api.github.com/repos/zebroi/vpn-catalog/contents/'+f.name,{headers:{'Authorization':'token '+tk}});
+if(gamePages.indexOf(slug)!==-1){lg('SKIP (game): '+f.name);continue;}
+lg('Processing: '+f.name+'...');
+var r2=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{headers:headers});
 var j=await r2.json();
-var raw=atob(j.content.replace(/\n/g,''));
+var raw=b64dec(j.content);
 var fixed=raw;
-// Get the service name from the page
-var svcMatch=fixed.match(/VPN для ([^<—]+?)\s*[—<]/);
-var svc=svcMatch?svcMatch[1].trim():slug.replace('vpn-dlya-','').replace(/-/g,' ');
-log('  Service: '+svc);
-// Fix replacements for non-game pages
-var replacements=[
-['Отзывы игроков о VPN для','Отзывы пользователей о VPN для'],
-['Играю в '+svc+' каждый день','Пользуюсь '+svc+' каждый день'],
-['Сын играет в '+svc,'Используем '+svc+' в семье'],
-['на планшете. VPN Гусь настроила за минуту','через VPN. VPN Гусь настроила за минуту'],
-['Для казуальной игры хватает','Для обычного использования хватает'],
-[svc+', игры',svc+', ежедневно'],
-[svc+', для детей',svc+', для семьи'],
-['для комфортной игры в '+svc,'для комфортного использования '+svc],
-['нарушение правил игры','нарушение правил сервиса'],
-['и других игр','и других сервисов'],
-['почему он важен для игр','почему он важен'],
-['WireGuard — современный VPN-протокол. Он в 3–5 раз быстрее OpenVPN и даёт низкий пинг — идеально для '+svc+' и других игр.','WireGuard — современный VPN-протокол. Он в 3–5 раз быстрее OpenVPN и даёт минимальные задержки — идеально для '+svc+' и других сервисов.'],
-['Можно ли играть в '+svc+' и просматривать YouTube с одним VPN','Можно ли использовать '+svc+' и смотреть YouTube с одним VPN'],
-['подходят и для '+svc+', и для YouTube 4K. Один сервис — два последовательных задачи.','подходят и для '+svc+', и для YouTube 4K. Один сервис для всех задач.'],
-['низкий пинг для игр','стабильное соединение'],
-['Игровые серверы с низким пингом для '+svc,'Быстрые серверы для '+svc],
-['Для игр','Быстрый'],
-['— низкий пинг и обход блокировок','— стабильный доступ и обход блокировок'],
-['Выбирайте по пингу, скорости и цене','Выбирайте по скорости, надёжности и цене'],
-['без лагов и банов','без сбоев и ограничений'],
-['Низкий пинг','Стабильный'],
-[svc+' казуал',svc+', обычное использование'],
-[svc+' без VPN',svc+' без VPN'],
+var pairs=[
+['\u043e\u0442\u0437\u044b\u0432\u044b \u0438\u0433\u0440\u043e\u043a\u043e\u0432 \u043e VPN \u0434\u043b\u044f','\u043e\u0442\u0437\u044b\u0432\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043e VPN \u0434\u043b\u044f'],
+['\u041e\u0442\u0437\u044b\u0432\u044b \u0438\u0433\u0440\u043e\u043a\u043e\u0432 \u043e VPN \u0434\u043b\u044f','\u041e\u0442\u0437\u044b\u0432\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043e VPN \u0434\u043b\u044f'],
+['\u0414\u043b\u044f \u043a\u0430\u0437\u0443\u0430\u043b\u044c\u043d\u043e\u0439 \u0438\u0433\u0440\u044b \u0445\u0432\u0430\u0442\u0430\u0435\u0442','\u0414\u043b\u044f \u043e\u0431\u044b\u0447\u043d\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u044f \u0445\u0432\u0430\u0442\u0430\u0435\u0442'],
+['\u043d\u0430\u0440\u0443\u0448\u0435\u043d\u0438\u0435 \u043f\u0440\u0430\u0432\u0438\u043b \u0438\u0433\u0440\u044b','\u043d\u0430\u0440\u0443\u0448\u0435\u043d\u0438\u0435 \u043f\u0440\u0430\u0432\u0438\u043b \u0441\u0435\u0440\u0432\u0438\u0441\u0430'],
+['\u0431\u0435\u0437 \u043b\u0430\u0433\u043e\u0432 \u0438 \u0431\u0430\u043d\u043e\u0432','\u0431\u0435\u0437 \u0441\u0431\u043e\u0435\u0432 \u0438 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u0439'],
+['\u043d\u0438\u0437\u043a\u0438\u0439 \u043f\u0438\u043d\u0433 \u0438 \u043e\u0431\u0445\u043e\u0434 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043e\u043a','\u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b\u0439 \u0434\u043e\u0441\u0442\u0443\u043f \u0438 \u043e\u0431\u0445\u043e\u0434 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043e\u043a'],
+['\u0412\u044b\u0431\u0438\u0440\u0430\u0439\u0442\u0435 \u043f\u043e \u043f\u0438\u043d\u0433\u0443, \u0441\u043a\u043e\u0440\u043e\u0441\u0442\u0438 \u0438 \u0446\u0435\u043d\u0435','\u0412\u044b\u0431\u0438\u0440\u0430\u0439\u0442\u0435 \u043f\u043e \u0441\u043a\u043e\u0440\u043e\u0441\u0442\u0438, \u043d\u0430\u0434\u0451\u0436\u043d\u043e\u0441\u0442\u0438 \u0438 \u0446\u0435\u043d\u0435'],
+['\u0418\u0433\u0440\u0430\u044e \u0432','\u041f\u043e\u043b\u044c\u0437\u0443\u044e\u0441\u044c'],
+['\u0438\u0433\u0440\u0430\u0435\u0442 \u0432','\u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442'],
+['\u043a\u0430\u0437\u0443\u0430\u043b ','\u043e\u0431\u044b\u0447\u043d\u043e\u0435 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u0435 '],
 ];
-for(var rp of replacements){
-fixed=fixed.split(rp[0]).join(rp[1]);
+for(var p=0;p<pairs.length;p++){
+fixed=fixed.split(pairs[p][0]).join(pairs[p][1]);
 }
-// Fix emoji for non-game sections
-fixed=fixed.replace(/\u{1F3AE} Топ подборка/gu,'\u{2B50} Топ подборка');
-fixed=fixed.replace(/\u{1F3AE} Каталог/gu,'\u{1F4CB} Каталог');
-if(fixed===raw){log('  No changes needed.');continue;}
-log('  Changes found, saving...');
-var b64=btoa(unescape(encodeURIComponent(fixed)));
-var resp=await fetch('https://api.github.com/repos/zebroi/vpn-catalog/contents/'+f.name,{method:'PUT',headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},body:JSON.stringify({message:'Fix game text in '+f.name,content:b64,branch:'main',sha:j.sha})});
-log('  '+(resp.ok?'SUCCESS':'FAIL: '+resp.status));
+fixed=fixed.replace(/\uD83C\uDFAE Топ подборка/g,'\u2B50 Топ подборка');
+fixed=fixed.replace(/\uD83C\uDFAE КАТАЛОГ/g,'\uD83D\uDCCB КАТАЛОГ');
+if(fixed===raw){lg('  no changes');continue;}
+lg('  saving...');
+var body=JSON.stringify({message:'fix text: '+f.name,content:b64enc(fixed),branch:'main',sha:j.sha});
+var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{method:'PUT',headers:headers,body:body});
+lg('  '+(resp.ok?'OK':'FAIL '+resp.status));
 if(resp.ok)count++;
-await new Promise(r=>setTimeout(r,500));
+await new Promise(function(r){setTimeout(r,400);});
 }
-log('\nDone! Fixed '+count+' files.');
+lg('Done! '+count+' files fixed.');
 }
 </script></body></html>
