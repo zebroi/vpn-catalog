@@ -1,10 +1,1 @@
-{
-  "version": 2,
-  "builds": [{ "src": "*.html", "use": "@vercel/static" }],
-  "routes": [
-        { "src": "/", "dest": "/index.html" },
-        { "src": "/vpn-dlya-youtube", "dest": "/vpn-catalog.html" },
-      { "src": "/vpn-dlya-roblox", "dest": "/vpn-dlya-roblox.html" },
-    { "src": "/(.*)\\.html", "dest": "/$1.html" }
-  ]
-}
+{"version":2,"cleanUrls":true,"builds":[{"src":"*.html","use":"@vercel/static"}],"routes":[{"src":"/","dest":"/index.html"}]}
