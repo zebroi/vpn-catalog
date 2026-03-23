@@ -4,11 +4,11 @@
 <button onclick="run()">FIX</button>
 <pre id="log"></pre>
 <script>
-const O='zebroi',R='vpn-catalog',B='main';
-const L=document.getElementById('log');
-function log(m){L.textContent+=m+'\n'}
+var O='zebroi',R='vpn-catalog',B='main';
+var L=document.getElementById('log');
+function log(m){L.textContent+=m+'\n';}
 
-const allFiles=[
+var allFiles=[
 'vpn-dlya-youtube','vpn-dlya-telegram','vpn-dlya-instagram','vpn-dlya-tiktok','vpn-dlya-whatsapp',
 'vpn-dlya-discord','vpn-dlya-facebook','vpn-dlya-snapchat','vpn-dlya-vkontakte','vpn-dlya-spotify',
 'vpn-dlya-twitch','vpn-dlya-google-play','vpn-dlya-chatgpt','vpn-dlya-gemini','vpn-dlya-steam',
@@ -29,88 +29,76 @@ const allFiles=[
 'vpn-dlya-zvonkov','vpn-razdacha-interneta'
 ];
 
-function fixHtml(h,fname){
-  // Remove Roblox artifacts in text
-  h=h.replace(/для игры в /g,'для ');
-  h=h.replace(/игры в [^<,.]{1,50} без лагов/g,'использования VPN');
-  h=h.replace(/игру в [^<,.]{1,50} без лагов/g,'использование VPN');
-  h=h.replace(/на серверах Роблокс/gi,'');
-  h=h.replace(/серверах Роблокс/gi,'серверах');
-  h=h.replace(/низкий пинг на серверах роблокс/gi,'');
-  h=h.replace(/Низкий пинг на серверах Роблокс[^<]*/gi,'');
-  h=h.replace(/Подборка проверенных сервисов для игры в [^<]* без лагов и банов/g,'Подборка проверенных VPN-сервисов для России');
-  h=h.replace(/Сравниваем 35 VPN-сервисов для игры в ([^в][^<]*) в России/g,'Сравниваем 35 VPN-сервисов для $1 в России');
-  h=h.replace(/Играю в Roblox каждый день[^<]*/g,'VPN работает стабильно, скорость отличная.');
-  h=h.replace(/Сын играет в Roblox[^<]*/g,'Пользуемся уже полгода, всё работает без сбоев.');
-  h=h.replace(/Бесплатный Proton для Roblox[^<]*/g,'Proton VPN отлично справляется с задачей.');
-  h=h.replace(/Данил К\./g,'Алексей М.');
-  h=h.replace(/Анна С\./g,'Мария К.');
-  h=h.replace(/Максим В\./g,'Дмитрий С.');
-  h=h.replace(/Зачем нужен VPN для Roblox\?/g,'Зачем нужен VPN?');
-  h=h.replace(/Roblox может быть замедлён[^<]*/g,'VPN обходит блокировки и замедления провайдеров.');
-  h=h.replace(/Какой VPN лучший для Roblox\?/g,'Какой VPN лучший в 2026?');
+function fixHtml(h){
+  var pairs=[
+    ['\u0434\u043B\u044F \u0438\u0433\u0440\u044B \u0432 ','\u0434\u043B\u044F '],
+    ['\u043D\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u0430\u0445 \u0420\u043E\u0431\u043B\u043E\u043A\u0441',''],
+    ['\u0441\u0435\u0440\u0432\u0435\u0440\u0430\u0445 \u0420\u043E\u0431\u043B\u043E\u043A\u0441','\u0441\u0435\u0440\u0432\u0435\u0440\u0430\u0445'],
+    ['\u0414\u0430\u043D\u0438\u043B \u041A.','\u0410\u043B\u0435\u043A\u0441\u0435\u0439 \u041C.'],
+    ['\u0410\u043D\u043D\u0430 \u0421.','\u041C\u0430\u0440\u0438\u044F \u041A.'],
+    ['\u041C\u0430\u043A\u0441\u0438\u043C \u0412.','\u0414\u043C\u0438\u0442\u0440\u0438\u0439 \u0421.']
+  ];
+  for(var i=0;i<pairs.length;i++){
+    while(h.indexOf(pairs[i][0])!==-1){
+      h=h.split(pairs[i][0]).join(pairs[i][1]);
+    }
+  }
   return h;
 }
 
-async function fixIndexHtml(tk){
-  log('Fixing index.html...');
-  const f=await getFile(tk,'index.html');
-  if(!f){log(' FAIL');return}
-  let h=f.content;
-  // The CSS and JS are dumped outside style/script tags after footer
-  // Find the pattern: raw CSS right after </footer>
-  if(h.includes('html.light{--bg:#f5f5f0') && !h.includes('<style>html.light')){
-    h=h.replace('html.light{--bg:#f5f5f0','<style>html.light{--bg:#f5f5f0');
-    // Find the end of CSS (before JS function)
-    h=h.replace('const t=localStorage.getItem(','</style><scr'+'ipt>const t=localStorage.getItem(');
-    // Add closing script tag before </body>
-    h=h.replace('</body>','</scr'+'ipt></body>');
-    log(' Fixed CSS/JS wrapping');
-  } else {
-    log(' Already fixed or different structure');
-  }
-  const ok=await putFile(tk,'index.html',h,f.sha,'Fix index.html: wrap CSS/JS in tags');
-  log(ok?' OK':' FAIL');
-}
-
 async function getFile(tk,path){
-  const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
+  var r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
     {headers:{'Authorization':'token '+tk}});
   if(!r.ok)return null;
-  const j=await r.json();
+  var j=await r.json();
   return {content:atob(j.content.replace(/\n/g,'')),sha:j.sha};
 }
 
 async function putFile(tk,path,content,sha,msg){
-  const b64=btoa(unescape(encodeURIComponent(content)));
-  const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
+  var b64=btoa(unescape(encodeURIComponent(content)));
+  var r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
     {method:'PUT',headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},
     body:JSON.stringify({message:msg,content:b64,branch:B,sha:sha})});
   return r.ok;
 }
 
-async function fixPage(tk,fname){
-  const f=await getFile(tk,fname+'.html');
-  if(!f){log(' skip (not found)');return}
-  const fixed=fixHtml(f.content,fname);
-  if(fixed===f.content){log(' no changes');return}
-  const ok=await putFile(tk,fname+'.html',fixed,f.sha,'Fix: remove Roblox artifacts');
+async function fixIndexHtml(tk){
+  log('Fixing index.html...');
+  var f=await getFile(tk,'index.html');
+  if(!f){log(' FAIL');return;}
+  var h=f.content;
+  if(h.indexOf('html.light{--bg:#f5f5f0')!==-1 && h.indexOf('<style>html.light')===-1){
+    h=h.replace('html.light{--bg:#f5f5f0','<style>html.light{--bg:#f5f5f0');
+    h=h.replace('const t=localStorage.getItem(','<'+'/style><'+'script>const t=localStorage.getItem(');
+    h=h.replace('<'+'/body>','<'+'/script><'+'/body>');
+    log(' Fixed CSS/JS wrapping');
+  } else {
+    log(' Already fixed or different structure');
+  }
+  var ok=await putFile(tk,'index.html',h,f.sha,'Fix index.html');
   log(ok?' OK':' FAIL');
 }
 
-async function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+async function fixPage(tk,fname){
+  var f=await getFile(tk,fname+'.html');
+  if(!f){log(' skip');return;}
+  var fixed=fixHtml(f.content);
+  if(fixed===f.content){log(' no changes');return;}
+  var ok=await putFile(tk,fname+'.html',fixed,f.sha,'Fix artifacts');
+  log(ok?' OK':' FAIL');
+}
 
 async function run(){
-  const tk=document.getElementById('tk').value.trim();
-  if(!tk){log('Enter token!');return}
-  log('=== Starting fix ===');
+  var tk=document.getElementById('tk').value.trim();
+  if(!tk){log('Enter token!');return;}
+  log('Starting fix...');
   await fixIndexHtml(tk);
-  for(let i=0;i<allFiles.length;i++){
-    log('['+(i+1)+'/'+allFiles.length+'] '+allFiles[i]+'...');
+  for(var i=0;i<allFiles.length;i++){
+    log('['+(i+1)+'/'+allFiles.length+'] '+allFiles[i]);
     await fixPage(tk,allFiles[i]);
-    await delay(500);
+    await new Promise(function(r){setTimeout(r,500);});
   }
-  log('=== ALL DONE ===');
+  log('ALL DONE!');
 }
-<\/script>
+</script>
 </body></html>
