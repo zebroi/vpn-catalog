@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [{ "src": "*.html", "use": "@vercel/static" }],
   "routes": [
-    { "src": "/", "dest": "/vpn-catalog.html" },
+        { "src": "/", "dest": "/index.html" },
     { "src": "/(.*)\\.html", "dest": "/$1.html" }
   ]
 }
