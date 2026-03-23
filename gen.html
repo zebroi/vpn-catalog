@@ -1,154 +1,102 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Generator</title></head><body>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Gen</title></head><body>
 <h2>VPN Page Generator</h2>
+<input id="tk" placeholder="GitHub Token" style="width:300px;padding:8px"><button onclick="run()">GO</button>
 <pre id="log"></pre>
 <script>
-const TOKEN='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';
 const OWNER='zebroi',REPO='vpn-catalog',BRANCH='main';
 const L=document.getElementById('log');
 function log(m){L.textContent+=m+'\n'}
-
 const pages=[
-{f:'vpn-dlya-youtube',t:'YouTube',d:'Обход замедления YouTube, 4K без тормозов',ic:'▶',cat:'Сервисы'},
-{f:'vpn-dlya-telegram',t:'Telegram',d:'Стабильный доступ к мессенджеру Telegram',ic:'✉',cat:'Сервисы'},
-{f:'vpn-dlya-instagram',t:'Instagram',d:'Разблокировка Instagram в России',ic:'📷',cat:'Сервисы'},
-{f:'vpn-dlya-tiktok',t:'TikTok',d:'Доступ к TikTok без ограничений',ic:'🎵',cat:'Сервисы'},
-{f:'vpn-dlya-whatsapp',t:'WhatsApp',d:'Звонки и сообщения WhatsApp без сбоев',ic:'💬',cat:'Сервисы'},
-{f:'vpn-dlya-discord',t:'Discord',d:'Голосовой чат Discord без лагов',ic:'🎮',cat:'Сервисы'},
-{f:'vpn-dlya-facebook',t:'Facebook',d:'Доступ к Facebook из РФ',ic:'👤',cat:'Сервисы'},
-{f:'vpn-dlya-snapchat',t:'Snapchat',d:'Разблокировка Snapchat в России',ic:'👻',cat:'Сервисы'},
-{f:'vpn-dlya-vkontakte',t:'ВКонтакте',d:'Доступ к VK из-за границы',ic:'🌐',cat:'Сервисы'},
-{f:'vpn-dlya-spotify',t:'Spotify',d:'Музыка Spotify без региональных ограничений',ic:'🎧',cat:'Сервисы'},
-{f:'vpn-dlya-twitch',t:'Twitch',d:'Стримы Twitch без буферизации',ic:'📺',cat:'Сервисы'},
-{f:'vpn-dlya-google-play',t:'Google Play',d:'Скачивание заблокированных приложений из Google Play',ic:'▶',cat:'Сервисы'},
-{f:'vpn-dlya-chatgpt',t:'ChatGPT',d:'Доступ к ChatGPT и GPT-4 из России',ic:'🤖',cat:'Сервисы'},
-{f:'vpn-dlya-gemini',t:'Gemini',d:'Доступ к Google Gemini из России',ic:'✨',cat:'Сервисы'},
-{f:'vpn-dlya-steam',t:'Steam',d:'Магазин Steam и мультиплеер без ограничений',ic:'🔥',cat:'Сервисы'},
-{f:'vpn-dlya-soundcloud',t:'SoundCloud',d:'Музыка SoundCloud без блокировок',ic:'🎶',cat:'Сервисы'},
-{f:'vpn-dlya-microsoft-store',t:'Microsoft Store',d:'Скачивание приложений из Microsoft Store',ic:'📦',cat:'Сервисы'},
-{f:'vpn-dlya-brawl-stars',t:'Brawl Stars',d:'Низкий пинг и стабильное соединение в Brawl Stars',ic:'⭐',cat:'Игры'},
-{f:'vpn-dlya-clash-royale',t:'Clash Royale',d:'Стабильный матчмейкинг в Clash Royale',ic:'👑',cat:'Игры'},
-{f:'vpn-dlya-minecraft',t:'Minecraft',d:'Серверы Minecraft без ограничений',ic:'⛏',cat:'Игры'},
-{f:'vpn-dlya-pubg-mobile',t:'PUBG Mobile',d:'Низкий пинг на серверах PUBG Mobile',ic:'🎯',cat:'Игры'},
-{f:'vpn-dlya-free-fire',t:'Free Fire',d:'Доступ ко всем серверам Free Fire',ic:'🔥',cat:'Игры'},
-{f:'vpn-dlya-fifa',t:'FIFA',d:'Онлайн-матчи FIFA без лагов',ic:'⚽',cat:'Игры'},
-{f:'vpn-dlya-gta',t:'GTA',d:'GTA Online без блокировок',ic:'🚗',cat:'Игры'},
-{f:'vpn-dlya-geometry-dash',t:'Geometry Dash',d:'Онлайн-уровни и серверы Geometry Dash',ic:'△',cat:'Игры'},
-{f:'vpn-dlya-nulls-brawl',t:'Nulls Brawl',d:'Доступ к приватному серверу Nulls Brawl',ic:'💥',cat:'Игры'},
-{f:'vpn-dlya-osu',t:'osu!',d:'Низкий пинг для ритм-игры osu!',ic:'●',cat:'Игры'},
-{f:'vpn-dlya-android',t:'Android',d:'Лучшие VPN-приложения для Android',ic:'📱',cat:'Платформы'},
-{f:'vpn-dlya-iphone',t:'iPhone',d:'VPN для iOS и iPhone',ic:'🍏',cat:'Платформы'},
-{f:'vpn-dlya-windows',t:'Windows',d:'VPN для Windows 7, 10, 11',ic:'🖥',cat:'Платформы'},
-{f:'vpn-dlya-macos',t:'macOS',d:'VPN для MacBook, iMac, Mac Mini',ic:'💻',cat:'Платформы'},
-{f:'vpn-dlya-linux',t:'Linux',d:'VPN для Ubuntu, Fedora, Debian',ic:'🐧',cat:'Платформы'},
-{f:'vpn-dlya-pk',t:'ПК',d:'VPN для компьютера и ноутбука',ic:'💻',cat:'Платформы'},
-{f:'vpn-dlya-smart-tv',t:'Smart TV',d:'VPN для телевизора и приставок',ic:'📺',cat:'Платформы'},
-{f:'vpn-dlya-android-tv',t:'Android TV',d:'VPN-приложения для Android TV',ic:'📺',cat:'Платформы'},
-{f:'vpn-dlya-plansheta',t:'планшета',d:'VPN для iPad и Android-планшетов',ic:'📏',cat:'Платформы'},
-{f:'vpn-dlya-samsung',t:'Samsung',d:'VPN для Galaxy и Smart TV Samsung',ic:'S',cat:'Платформы'},
-{f:'vpn-dlya-huawei',t:'Huawei',d:'VPN для Huawei без Google — специфика установки',ic:'H',cat:'Платформы'},
-{f:'vpn-dlya-xiaomi',t:'Xiaomi',d:'VPN для MIUI и Xiaomi смартфонов',ic:'X',cat:'Платформы'},
-{f:'vpn-dlya-redmi',t:'Redmi',d:'VPN для Redmi Note и Redmi серии',ic:'R',cat:'Платформы'},
-{f:'vpn-dlya-honor',t:'Honor',d:'VPN для Honor смартфонов',ic:'H',cat:'Платформы'},
-{f:'vpn-dlya-lg',t:'LG',d:'VPN для LG Smart TV',ic:'L',cat:'Платформы'},
-{f:'vpn-dlya-yandex-brauzera',t:'Яндекс Браузера',d:'VPN-расширения для Яндекс Браузера',ic:'Я',cat:'Браузеры'},
-{f:'vpn-dlya-google-chrome',t:'Google Chrome',d:'VPN-расширения для Chrome',ic:'C',cat:'Браузеры'},
-{f:'vpn-dlya-opera',t:'Opera',d:'Встроенный VPN Opera и расширения',ic:'O',cat:'Браузеры'},
-{f:'vpn-dlya-edge',t:'Microsoft Edge',d:'VPN-расширения для Edge',ic:'E',cat:'Браузеры'},
-{f:'vpn-dlya-routera',t:'роутера',d:'VPN на роутере — защита всех устройств дома',ic:'📡',cat:'Роутеры'},
-{f:'vpn-dlya-tp-link',t:'TP-Link',d:'Настройка VPN на роутере TP-Link',ic:'T',cat:'Роутеры'},
-{f:'vpn-dlya-keenetic',t:'Keenetic',d:'Настройка VPN на Keenetic',ic:'K',cat:'Роутеры'},
-{f:'vpn-dlya-xiaomi-routera',t:'Xiaomi (роутер)',d:'Настройка VPN на роутере Xiaomi',ic:'X',cat:'Роутеры'},
-{f:'vpn-dlya-mts',t:'МТС',d:'Обход ограничений МТС с помощью VPN',ic:'М',cat:'Операторы'},
-{f:'vpn-dlya-bilajn',t:'Билайн',d:'Обход ограничений Билайн',ic:'Б',cat:'Операторы'},
-{f:'vpn-dlya-megafon',t:'Мегафон',d:'Обход ограничений Мегафон',ic:'М',cat:'Операторы'},
-{f:'vpn-dlya-rostelekom',t:'Ростелеком',d:'Обход ограничений Ростелеком',ic:'Р',cat:'Операторы'},
-{f:'vpn-v2ray',t:'V2Ray / V2RayNG',d:'Протокол V2Ray и настройка клиента V2RayNG',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-vless',t:'VLESS',d:'Современный протокол обхода блокировок VLESS',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-wireguard',t:'WireGuard',d:'Быстрый и лёгкий VPN-протокол WireGuard',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-openvpn',t:'OpenVPN',d:'Классический VPN-протокол OpenVPN',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-outline',t:'Outline VPN',d:'Простой самохостинг VPN с Outline',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-hiddify',t:'Hiddify',d:'Клиент Hiddify для обхода блокировок',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-amnezia',t:'Amnezia VPN',d:'Open-source VPN с AmneziaWG',ic:'🛡',cat:'Протоколы'},
-{f:'vpn-adguard',t:'AdGuard VPN',d:'VPN с блокировкой рекламы от AdGuard',ic:'🛡',cat:'Протоколы'},
-{f:'vpn-byedpi',t:'byeDPI',d:'Обход DPI без VPN-сервера с byeDPI',ic:'🚫',cat:'Протоколы'},
-{f:'vpn-proton',t:'Proton VPN',d:'Швейцарская безопасность с Proton VPN',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-planet',t:'Planet VPN',d:'Бесплатные серверы Planet VPN',ic:'🌏',cat:'Протоколы'},
-{f:'vpn-hitproxy',t:'HitProxy',d:'Прокси-сервис HitProxy',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-happ',t:'Happ VPN',d:'VPN Happ и Happ Plus',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-fkey',t:'fkey VPN',d:'Лёгкий VPN-клиент fkey',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-dyadya-vanya',t:'Дядя Ваня VPN',d:'Российский VPN-сервис Дядя Ваня',ic:'🔒',cat:'Протоколы'},
-{f:'vpn-dlya-rossii',t:'России',d:'Обход блокировок в РФ с VPN',ic:'🇷🇺',cat:'Гео'},
-{f:'vpn-dlya-kryma',t:'Крыма',d:'Доступ к сервисам в Крыму через VPN',ic:'🏖',cat:'Гео'},
-{f:'vpn-dlya-kazahstana',t:'Казахстана',d:'Обход блокировок в Казахстане',ic:'🇰🇿',cat:'Гео'},
-{f:'vpn-dlya-belarusi',t:'Беларуси',d:'Обход блокировок в Беларуси',ic:'🇧🇾',cat:'Гео'},
-{f:'vpn-dlya-kitaya',t:'Китая',d:'Обход Great Firewall Китая',ic:'🇨🇳',cat:'Гео'},
-{f:'vpn-dlya-ssha',t:'США',d:'Американский IP-адрес через VPN',ic:'🇺🇸',cat:'Гео'},
-{f:'vpn-obhod-blokirovok',t:'обхода блокировок',d:'Общий обход блокировок в РФ с VPN',ic:'🔓',cat:'Задачи'},
-{f:'vpn-obhod-belogo-spiska',t:'обхода белого списка',d:'VPN когда работают только разрешённые сайты',ic:'✅',cat:'Задачи'},
-{f:'vpn-obhod-glushilok',t:'обхода глушилок',d:'VPN при глушении интернета',ic:'📡',cat:'Задачи'},
-{f:'vpn-mobilnyj-internet',t:'мобильного интернета',d:'VPN когда глушат мобильную сеть',ic:'📶',cat:'Задачи'},
-{f:'vpn-dlya-raboty',t:'работы',d:'VPN для бизнеса и удалённой работы',ic:'💼',cat:'Задачи'},
-{f:'vpn-dlya-doma',t:'дома',d:'VPN на роутере для всей семьи',ic:'🏠',cat:'Задачи'},
-{f:'vpn-dlya-torrentov',t:'торрентов',d:'Скачивание торрентов через VPN',ic:'⬇',cat:'Задачи'},
-{f:'vpn-smena-regiona',t:'смены региона',d:'Изменение геолокации через VPN',ic:'🌍',cat:'Задачи'},
-{f:'vpn-uskoreniye-interneta',t:'ускорения интернета',d:'Обход замедления провайдером через VPN',ic:'⚡',cat:'Задачи'},
-{f:'vpn-dlya-igr',t:'игр',d:'VPN для игр — низкий пинг и стабильность',ic:'🎮',cat:'Задачи'},
-{f:'vpn-dlya-zvonkov',t:'звонков',d:'Стабильные звонки через VPN',ic:'📞',cat:'Задачи'},
-{f:'vpn-razdacha-interneta',t:'раздачи интернета',d:'Обход ограничения раздачи интернета через VPN',ic:'📶',cat:'Задачи'}
+{f:'vpn-dlya-youtube',t:'YouTube',d:'Обход замедления YouTube, 4K без тормозов'},
+{f:'vpn-dlya-telegram',t:'Telegram',d:'Стабильный доступ к мессенджеру Telegram'},
+{f:'vpn-dlya-instagram',t:'Instagram',d:'Разблокировка Instagram в России'},
+{f:'vpn-dlya-tiktok',t:'TikTok',d:'Доступ к TikTok без ограничений'},
+{f:'vpn-dlya-whatsapp',t:'WhatsApp',d:'Звонки и сообщения WhatsApp без сбоев'},
+{f:'vpn-dlya-discord',t:'Discord',d:'Голосовой чат Discord без лагов'},
+{f:'vpn-dlya-facebook',t:'Facebook',d:'Доступ к Facebook из РФ'},
+{f:'vpn-dlya-snapchat',t:'Snapchat',d:'Разблокировка Snapchat в России'},
+{f:'vpn-dlya-vkontakte',t:'ВКонтакте',d:'Доступ к VK из-за границы'},
+{f:'vpn-dlya-spotify',t:'Spotify',d:'Музыка Spotify без региональных ограничений'},
+{f:'vpn-dlya-twitch',t:'Twitch',d:'Стримы Twitch без буферизации'},
+{f:'vpn-dlya-google-play',t:'Google Play',d:'Скачивание заблокированных приложений'},
+{f:'vpn-dlya-chatgpt',t:'ChatGPT',d:'Доступ к ChatGPT и GPT-4 из России'},
+{f:'vpn-dlya-gemini',t:'Gemini',d:'Доступ к Google Gemini из России'},
+{f:'vpn-dlya-steam',t:'Steam',d:'Магазин Steam и мультиплеер'},
+{f:'vpn-dlya-soundcloud',t:'SoundCloud',d:'Музыка SoundCloud без блокировок'},
+{f:'vpn-dlya-microsoft-store',t:'Microsoft Store',d:'Скачивание приложений Microsoft Store'},
+{f:'vpn-dlya-brawl-stars',t:'Brawl Stars',d:'Низкий пинг в Brawl Stars'},
+{f:'vpn-dlya-clash-royale',t:'Clash Royale',d:'Стабильный матчмейкинг Clash Royale'},
+{f:'vpn-dlya-minecraft',t:'Minecraft',d:'Серверы Minecraft без ограничений'},
+{f:'vpn-dlya-pubg-mobile',t:'PUBG Mobile',d:'Низкий пинг PUBG Mobile'},
+{f:'vpn-dlya-free-fire',t:'Free Fire',d:'Доступ ко всем серверам Free Fire'},
+{f:'vpn-dlya-fifa',t:'FIFA',d:'Онлайн-матчи FIFA без лагов'},
+{f:'vpn-dlya-gta',t:'GTA',d:'GTA Online без блокировок'},
+{f:'vpn-dlya-geometry-dash',t:'Geometry Dash',d:'Онлайн-уровни Geometry Dash'},
+{f:'vpn-dlya-nulls-brawl',t:'Nulls Brawl',d:'Доступ к приватному серверу Nulls Brawl'},
+{f:'vpn-dlya-osu',t:'osu!',d:'Низкий пинг для ритм-игры osu!'},
+{f:'vpn-dlya-android',t:'Android',d:'Лучшие VPN для Android'},
+{f:'vpn-dlya-iphone',t:'iPhone',d:'VPN для iOS и iPhone'},
+{f:'vpn-dlya-windows',t:'Windows',d:'VPN для Windows 7, 10, 11'},
+{f:'vpn-dlya-macos',t:'macOS',d:'VPN для MacBook, iMac'},
+{f:'vpn-dlya-linux',t:'Linux',d:'VPN для Ubuntu, Fedora, Debian'},
+{f:'vpn-dlya-pk',t:'ПК',d:'VPN для компьютера и ноутбука'},
+{f:'vpn-dlya-smart-tv',t:'Smart TV',d:'VPN для телевизора и приставок'},
+{f:'vpn-dlya-android-tv',t:'Android TV',d:'VPN для Android TV'},
+{f:'vpn-dlya-plansheta',t:'планшета',d:'VPN для iPad и Android-планшетов'},
+{f:'vpn-dlya-samsung',t:'Samsung',d:'VPN для Galaxy и Samsung TV'},
+{f:'vpn-dlya-huawei',t:'Huawei',d:'VPN для Huawei без Google'},
+{f:'vpn-dlya-xiaomi',t:'Xiaomi',d:'VPN для MIUI и Xiaomi'},
+{f:'vpn-dlya-redmi',t:'Redmi',d:'VPN для Redmi Note и Redmi серии'},
+{f:'vpn-dlya-honor',t:'Honor',d:'VPN для Honor смартфонов'},
+{f:'vpn-dlya-lg',t:'LG',d:'VPN для LG Smart TV'},
+{f:'vpn-dlya-yandex-brauzera',t:'Яндекс Браузера',d:'VPN-расширения для Яндекс Браузера'},
+{f:'vpn-dlya-google-chrome',t:'Google Chrome',d:'VPN-расширения для Chrome'},
+{f:'vpn-dlya-opera',t:'Opera',d:'Встроенный VPN Opera и расширения'},
+{f:'vpn-dlya-edge',t:'Microsoft Edge',d:'VPN-расширения для Edge'},
+{f:'vpn-dlya-routera',t:'роутера',d:'VPN на роутере для всех устройств'},
+{f:'vpn-dlya-tp-link',t:'TP-Link',d:'Настройка VPN на TP-Link'},
+{f:'vpn-dlya-keenetic',t:'Keenetic',d:'Настройка VPN на Keenetic'},
+{f:'vpn-dlya-xiaomi-routera',t:'Xiaomi роутер',d:'Настройка VPN на Xiaomi роутере'},
+{f:'vpn-dlya-mts',t:'МТС',d:'Обход ограничений МТС'},
+{f:'vpn-dlya-bilajn',t:'Билайн',d:'Обход ограничений Билайн'},
+{f:'vpn-dlya-megafon',t:'Мегафон',d:'Обход ограничений Мегафон'},
+{f:'vpn-dlya-rostelekom',t:'Ростелеком',d:'Обход ограничений Ростелеком'},
+{f:'vpn-v2ray',t:'V2Ray',d:'Протокол V2Ray и настройка V2RayNG'},
+{f:'vpn-vless',t:'VLESS',d:'Протокол VLESS для обхода блокировок'},
+{f:'vpn-wireguard',t:'WireGuard',d:'Быстрый VPN-протокол WireGuard'},
+{f:'vpn-openvpn',t:'OpenVPN',d:'Классический протокол OpenVPN'},
+{f:'vpn-outline',t:'Outline VPN',d:'Простой самохостинг Outline'},
+{f:'vpn-hiddify',t:'Hiddify',d:'Клиент Hiddify для обхода блокировок'},
+{f:'vpn-amnezia',t:'Amnezia VPN',d:'Open-source VPN AmneziaWG'},
+{f:'vpn-adguard',t:'AdGuard VPN',d:'VPN с блокировкой рекламы'},
+{f:'vpn-byedpi',t:'byeDPI',d:'Обход DPI без VPN-сервера'},
+{f:'vpn-proton',t:'Proton VPN',d:'Швейцарская безопасность Proton'},
+{f:'vpn-planet',t:'Planet VPN',d:'Бесплатные серверы Planet VPN'},
+{f:'vpn-hitproxy',t:'HitProxy',d:'Прокси-сервис HitProxy'},
+{f:'vpn-happ',t:'Happ VPN',d:'VPN Happ и Happ Plus'},
+{f:'vpn-fkey',t:'fkey VPN',d:'Лёгкий VPN-клиент fkey'},
+{f:'vpn-dyadya-vanya',t:'Дядя Ваня VPN',d:'Российский VPN Дядя Ваня'},
+{f:'vpn-dlya-rossii',t:'России',d:'Обход блокировок в РФ'},
+{f:'vpn-dlya-kryma',t:'Крыма',d:'Доступ к сервисам в Крыму'},
+{f:'vpn-dlya-kazahstana',t:'Казахстана',d:'Обход блокировок в Казахстане'},
+{f:'vpn-dlya-belarusi',t:'Беларуси',d:'Обход блокировок в Беларуси'},
+{f:'vpn-dlya-kitaya',t:'Китая',d:'Обход Great Firewall Китая'},
+{f:'vpn-dlya-ssha',t:'США',d:'Американский IP через VPN'},
+{f:'vpn-obhod-blokirovok',t:'обхода блокировок',d:'Общий обход блокировок в РФ'},
+{f:'vpn-obhod-belogo-spiska',t:'обхода белого списка',d:'VPN для белого списка'},
+{f:'vpn-obhod-glushilok',t:'обхода глушилок',d:'VPN при глушении интернета'},
+{f:'vpn-mobilnyj-internet',t:'мобильного интернета',d:'VPN для мобильной сети'},
+{f:'vpn-dlya-raboty',t:'работы',d:'VPN для бизнеса и удалёнки'},
+{f:'vpn-dlya-doma',t:'дома',d:'VPN на роутере для семьи'},
+{f:'vpn-dlya-torrentov',t:'торрентов',d:'Скачивание торрентов через VPN'},
+{f:'vpn-smena-regiona',t:'смены региона',d:'Изменение геолокации через VPN'},
+{f:'vpn-uskoreniye-interneta',t:'ускорения интернета',d:'Обход замедления провайдером'},
+{f:'vpn-dlya-igr',t:'игр',d:'VPN для игр — низкий пинг'},
+{f:'vpn-dlya-zvonkov',t:'звонков',d:'Стабильные звонки через VPN'},
+{f:'vpn-razdacha-interneta',t:'раздачи интернета',d:'Обход ограничения раздачи'}
 ];
-
-async function getTemplate(){
- const r=await fetch('https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/vpn-dlya-roblox.html');
- return await r.text();
-}
-
-function makePageContent(tpl,p){
- let h=tpl;
- h=h.replace(/Roblox/g,p.t);
- h=h.replace(/roblox/gi,p.t.toLowerCase());
- h=h.replace(/<title>[^<]*<\/title>/,'<title>VPN для '+p.t+' — ТОП 2026 | VPNбаза</title>');
- h=h.replace(/content="[^"]*Лучшие VPN[^"]*"/,'content="'+p.d+' 2026. Nony VPN от 99 руб/мес, 7 дней бесплатно. VPN Гусь — бесплатный ключ. Топ-15 сравнение."');
- h=h.replace(/VPN для Roblox/g,'VPN для '+p.t);
- h=h.replace(/vpn-dlya-roblox/g,p.f);
- h=h.replace(/игры в Roblox/g,p.d.toLowerCase());
- h=h.replace(/игру в Roblox/g,p.d.toLowerCase());
- h=h.replace(/Roblox в России/g,p.t+' в России');
- h=h.replace(/для игры в Roblox/g,'для '+p.t);
- h=h.replace(/низкий пинг и обход блокировок/gi,p.d);
- return h;
-}
-
-async function createFile(path,content,msg){
- const b64=btoa(unescape(encodeURIComponent(content)));
- let sha=null;
- try{
-  const g=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path,{headers:{'Authorization':'token '+TOKEN}});
-  if(g.ok){const j=await g.json();sha=j.sha}
- }catch(e){}
- const body={message:msg,content:b64,branch:BRANCH};
- if(sha)body.sha=sha;
- const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path,{
-  method:'PUT',headers:{'Authorization':'token '+TOKEN,'Content-Type':'application/json'},
-  body:JSON.stringify(body)
- });
- return r.ok;
-}
-
-async function run(){
- log('Загружаю шаблон...');
- const tpl=await getTemplate();
- log('Шаблон загружен ('+tpl.length+' символов)');
- let ok=0,fail=0;
- for(let i=0;i<pages.length;i++){
-  const p=pages[i];
-  const fn=p.f+'.html';
-  log('['+(i+1)+'/'+pages.length+'] Создаю '+fn+'...');
-  const content=makePageContent(tpl,p);
-  const success=await createFile(fn,content,'Add '+fn);
-  if(success){ok++;log('  OK')}else{fail++;log('  FAIL')}
-  await new Promise(r=>setTimeout(r,500));
- }
- log('Готово! Создано: '+ok+', ошибок: '+fail);
-}
-run();
+async function getTemplate(){const r=await fetch('https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/vpn-dlya-roblox.html');return await r.text()}
+function makePage(tpl,p){let h=tpl;h=h.replace(/<title>[^<]*<\/title>/,'<title>VPN для '+p.t+' \u2014 \u0422\u041e\u041f 2026 | VPN\u0431\u0430\u0437\u0430</title>');h=h.replace(/VPN для Roblox/g,'VPN для '+p.t);h=h.replace(/vpn-dlya-roblox/g,p.f);h=h.replace(/Roblox/g,p.t);h=h.replace(/roblox/gi,p.t.toLowerCase());return h}
+async function createFile(tk,path,content,msg){const b64=btoa(unescape(encodeURIComponent(content)));let sha=null;try{const g=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path,{headers:{'Authorization':'token '+tk}});if(g.ok){const j=await g.json();sha=j.sha}}catch(e){}const body={message:msg,content:b64,branch:BRANCH};if(sha)body.sha=sha;const r=await fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+path,{method:'PUT',headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},body:JSON.stringify(body)});return r.ok}
+async function run(){const tk=document.getElementById('tk').value.trim();if(!tk){log('Enter token!');return}log('Loading template...');const tpl=await getTemplate();log('Template: '+tpl.length+' chars');let ok=0,fail=0;for(let i=0;i<pages.length;i++){const p=pages[i];const fn=p.f+'.html';log('['+(i+1)+'/'+pages.length+'] '+fn+'...');const c=makePage(tpl,p);const s=await createFile(tk,fn,c,'Add '+fn);if(s){ok++;log('  OK')}else{fail++;log('  FAIL')}await new Promise(r=>setTimeout(r,800))}log('Done! OK:'+ok+' FAIL:'+fail)}
 </script></body></html>
