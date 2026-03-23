@@ -1,0 +1,76 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix4 - Update index.html design</title></head><body>
+<h2>Update index.html to match inner pages design</h2>
+<input id="tk" placeholder="Token" style="width:400px;padding:8px"><br><br>
+<button onclick="run()">UPDATE INDEX</button>
+<pre id="log" style="white-space:pre-wrap;font-size:12px;max-height:600px;overflow:auto"></pre>
+<script>
+var REPO='zebroi/vpn-catalog';
+var L=document.getElementById('log');
+function lg(s){L.textContent+=s+'\n';L.scrollTop=9e9;}
+function dec(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))));}
+function enc(s){return btoa(unescape(encodeURIComponent(s)));}
+async function run(){
+var tk=document.getElementById('tk').value.trim();
+if(!tk){alert('token');return;}
+var H={'Authorization':'token '+tk,'Content-Type':'application/json'};
+lg('Reading index.html...');
+var r=await fetch('https://api.github.com/repos/'+REPO+'/contents/index.html',{headers:H});
+var j=await r.json();
+var raw=dec(j.content);
+lg('Size: '+raw.length);
+var x=raw;
+// Replace CSS variables for light theme matching inner pages
+x=x.split('--bg:#0a0f0d').join('--bg:#f7f6f2');
+x=x.split('--card:#131a16').join('--card:#f9f8f5');
+x=x.split('--accent:#2ecc71').join('--accent:#0f766e');
+x=x.split('--text:#e0e0e0').join('--text:#28251d');
+x=x.split('--muted:#8a8a8a').join('--muted:#7a7974');
+x=x.split('--border:#1e2a24').join('--border:#d4d1ca');
+// Fix header/hero colors
+x=x.split('color:#fff').join('color:#28251d');
+x=x.split('background:linear-gradient(135deg,#1a2f23,#0d1a13)').join('background:linear-gradient(135deg,#e8f5e9,#f0f7f0)');
+// Fix top-banner border
+x=x.split('border:1px solid var(--accent)').join('border:1px solid #d4d1ca');
+// Add Google Fonts link before </head>
+x=x.split('</head>').join('<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap" rel="stylesheet"></head>');
+// Update font-family
+x=x.split("font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif").join("font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif");
+// Fix light theme overrides (remove old light theme since we're now light by default)
+x=x.split('html.light{--bg:#f5f5f0;--card:#fff;--text:#1a1a1a;--muted:#666;--border:#e0e0e0;--accent:#1a8a4a}').join('');
+x=x.split('html.light .logo{color:#1a1a1a}').join('');
+x=x.split('html.light .section-title{color:#1a1a1a}').join('');
+x=x.split('html.light .card h3{color:#1a1a1a}').join('');
+x=x.split('html.light .hero h1{color:#1a1a1a}').join('');
+// Fix button colors
+x=x.split('background:var(--accent);color:#000').join('background:var(--accent);color:#fff');
+// Fix card shadow
+x=x.split('.card:hover{border-color:var(--accent);transform:translateY(-2px)}').join('.card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}');
+// Add subtle shadow to cards
+x=x.split('.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:border-color .2s,transform .2s}').join('.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.04)}');
+// Fix footer
+x=x.split('footer{background:var(--card)').join('footer{background:#f3f0ec');
+// Fix hero-stats
+x=x.split('.hero-stats strong{display:block;font-size:24px;color:var(--accent)}').join('.hero-stats strong{display:block;font-size:24px;color:var(--accent);font-family:Manrope,sans-serif}');
+// Fix section-title font
+x=x.split('.section-title{font-size:28px;color:#fff').join('.section-title{font-size:28px;color:#28251d;font-family:Manrope,sans-serif');
+// Fix h1 font
+x=x.split('.hero h1{font-size:clamp(28px,5vw,48px);color:#fff').join('.hero h1{font-size:clamp(28px,5vw,48px);color:#28251d;font-family:Manrope,sans-serif');
+// Fix card h3 font
+x=x.split('.card h3{font-size:18px;color:#fff').join('.card h3{font-size:18px;color:#28251d;font-family:Manrope,sans-serif');
+// Fix logo
+x=x.split('.logo{font-size:20px;font-weight:700;color:#fff}').join('.logo{font-size:20px;font-weight:800;color:#28251d;font-family:Manrope,sans-serif}');
+x=x.split('.logo span{color:var(--accent)}').join('.logo span{color:var(--accent)}');
+// Fix header background
+x=x.split('header{background:var(--card);border-bottom:1px solid var(--border)').join('header{background:#fff;border-bottom:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.05)');
+// Fix hero background
+x=x.split('.hero{text-align:center;padding:80px 20px 60px}').join('.hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(180deg,#f9f8f5 0%,#f7f6f2 100%)}');
+// Fix cat-label
+x=x.split('.cat-label{display:inline-block;background:var(--accent);color:#000').join('.cat-label{display:inline-block;background:var(--accent);color:#fff');
+lg('Replacements done.');
+if(x===raw){lg('No changes!');return;}
+lg('Saving...');
+var bd=JSON.stringify({message:'Redesign index.html to match inner pages',content:enc(x),branch:'main',sha:j.sha});
+var rp=await fetch('https://api.github.com/repos/'+REPO+'/contents/index.html',{method:'PUT',headers:H,body:bd});
+lg(rp.ok?'SUCCESS':'FAIL '+rp.status);
+}
+</script></body></html>
