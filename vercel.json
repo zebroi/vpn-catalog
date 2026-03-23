@@ -3,6 +3,7 @@
   "builds": [{ "src": "*.html", "use": "@vercel/static" }],
   "routes": [
         { "src": "/", "dest": "/index.html" },
+        { "src": "/vpn-dlya-youtube", "dest": "/vpn-catalog.html" },
     { "src": "/(.*)\\.html", "dest": "/$1.html" }
   ]
 }
