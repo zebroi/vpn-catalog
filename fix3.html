@@ -1,59 +1,53 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix Game Text</title></head><body>
-<h2>Fix game-related text in non-game pages</h2>
-<input id="tk" placeholder="GitHub Token" style="width:400px;padding:8px"><br><br>
-<button onclick="run()">FIX ALL NON-GAME PAGES</button>
-<pre id="log" style="white-space:pre-wrap;font-size:12px;max-height:600px;overflow:auto;margin-top:12px"></pre>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix3</title></head><body>
+<h2>Fix game text v3</h2>
+<input id="tk" placeholder="Token" style="width:400px;padding:8px"><br><br>
+<button onclick="run()">RUN</button>
+<pre id="log" style="white-space:pre-wrap;font-size:12px;max-height:600px;overflow:auto"></pre>
 <script>
 var REPO='zebroi/vpn-catalog';
-var gamePages=['vpn-dlya-roblox','vpn-dlya-brawl-stars','vpn-dlya-clash-royale','vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu','vpn-dlya-igr'];
+var GP=['vpn-dlya-roblox','vpn-dlya-brawl-stars','vpn-dlya-clash-royale','vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu','vpn-dlya-igr'];
 var L=document.getElementById('log');
-function lg(s){L.textContent+=s+'\n';L.scrollTop=L.scrollHeight;}
-function b64dec(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))));}
-function b64enc(s){return btoa(unescape(encodeURIComponent(s)));}
+function lg(s){L.textContent+=s+'\n';L.scrollTop=9e9;}
+function dec(s){return decodeURIComponent(escape(atob(s.replace(/\n/g,''))));}
+function enc(s){return btoa(unescape(encodeURIComponent(s)));}
 async function run(){
 var tk=document.getElementById('tk').value.trim();
-if(!tk){alert('Enter token');return;}
-var headers={'Authorization':'token '+tk,'Content-Type':'application/json'};
-lg('Fetching file list...');
-var r=await fetch('https://api.github.com/repos/'+REPO+'/contents/',{headers:headers});
-var files=await r.json();
-var htmlFiles=files.filter(function(f){return f.name.startsWith('vpn-')&&f.name.endsWith('.html');});
-lg('Found '+htmlFiles.length+' vpn-* files');
-var count=0;
-for(var i=0;i<htmlFiles.length;i++){
-var f=htmlFiles[i];
-var slug=f.name.replace('.html','');
-if(gamePages.indexOf(slug)!==-1){lg('SKIP (game): '+f.name);continue;}
-lg('Processing: '+f.name+'...');
-var r2=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{headers:headers});
+if(!tk){alert('token');return;}
+var H={'Authorization':'token '+tk,'Content-Type':'application/json'};
+lg('Fetching...');
+var r=await fetch('https://api.github.com/repos/'+REPO+'/contents/',{headers:H});
+var fs=await r.json();
+var hf=fs.filter(function(f){return f.name.startsWith('vpn-')&&f.name.endsWith('.html');});
+lg(hf.length+' files');
+var c=0;
+for(var i=0;i<hf.length;i++){
+var f=hf[i],sl=f.name.replace('.html','');
+if(GP.indexOf(sl)!==-1){lg('SKIP '+f.name);continue;}
+lg(f.name+'...');
+var r2=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{headers:H});
 var j=await r2.json();
-var raw=b64dec(j.content);
-var fixed=raw;
-var pairs=[
-['\u043e\u0442\u0437\u044b\u0432\u044b \u0438\u0433\u0440\u043e\u043a\u043e\u0432 \u043e VPN \u0434\u043b\u044f','\u043e\u0442\u0437\u044b\u0432\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043e VPN \u0434\u043b\u044f'],
-['\u041e\u0442\u0437\u044b\u0432\u044b \u0438\u0433\u0440\u043e\u043a\u043e\u0432 \u043e VPN \u0434\u043b\u044f','\u041e\u0442\u0437\u044b\u0432\u044b \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043e VPN \u0434\u043b\u044f'],
-['\u0414\u043b\u044f \u043a\u0430\u0437\u0443\u0430\u043b\u044c\u043d\u043e\u0439 \u0438\u0433\u0440\u044b \u0445\u0432\u0430\u0442\u0430\u0435\u0442','\u0414\u043b\u044f \u043e\u0431\u044b\u0447\u043d\u043e\u0433\u043e \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u044f \u0445\u0432\u0430\u0442\u0430\u0435\u0442'],
-['\u043d\u0430\u0440\u0443\u0448\u0435\u043d\u0438\u0435 \u043f\u0440\u0430\u0432\u0438\u043b \u0438\u0433\u0440\u044b','\u043d\u0430\u0440\u0443\u0448\u0435\u043d\u0438\u0435 \u043f\u0440\u0430\u0432\u0438\u043b \u0441\u0435\u0440\u0432\u0438\u0441\u0430'],
-['\u0431\u0435\u0437 \u043b\u0430\u0433\u043e\u0432 \u0438 \u0431\u0430\u043d\u043e\u0432','\u0431\u0435\u0437 \u0441\u0431\u043e\u0435\u0432 \u0438 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u0438\u0439'],
-['\u043d\u0438\u0437\u043a\u0438\u0439 \u043f\u0438\u043d\u0433 \u0438 \u043e\u0431\u0445\u043e\u0434 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043e\u043a','\u0441\u0442\u0430\u0431\u0438\u043b\u044c\u043d\u044b\u0439 \u0434\u043e\u0441\u0442\u0443\u043f \u0438 \u043e\u0431\u0445\u043e\u0434 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u043e\u043a'],
-['\u0412\u044b\u0431\u0438\u0440\u0430\u0439\u0442\u0435 \u043f\u043e \u043f\u0438\u043d\u0433\u0443, \u0441\u043a\u043e\u0440\u043e\u0441\u0442\u0438 \u0438 \u0446\u0435\u043d\u0435','\u0412\u044b\u0431\u0438\u0440\u0430\u0439\u0442\u0435 \u043f\u043e \u0441\u043a\u043e\u0440\u043e\u0441\u0442\u0438, \u043d\u0430\u0434\u0451\u0436\u043d\u043e\u0441\u0442\u0438 \u0438 \u0446\u0435\u043d\u0435'],
-['\u0418\u0433\u0440\u0430\u044e \u0432','\u041f\u043e\u043b\u044c\u0437\u0443\u044e\u0441\u044c'],
-['\u0438\u0433\u0440\u0430\u0435\u0442 \u0432','\u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442'],
-['\u043a\u0430\u0437\u0443\u0430\u043b ','\u043e\u0431\u044b\u0447\u043d\u043e\u0435 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u043d\u0438\u0435 '],
-];
-for(var p=0;p<pairs.length;p++){
-fixed=fixed.split(pairs[p][0]).join(pairs[p][1]);
-}
-fixed=fixed.replace(/\uD83C\uDFAE Топ подборка/g,'\u2B50 Топ подборка');
-fixed=fixed.replace(/\uD83C\uDFAE КАТАЛОГ/g,'\uD83D\uDCCB КАТАЛОГ');
-if(fixed===raw){lg('  no changes');continue;}
-lg('  saving...');
-var body=JSON.stringify({message:'fix text: '+f.name,content:b64enc(fixed),branch:'main',sha:j.sha});
-var resp=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{method:'PUT',headers:headers,body:body});
-lg('  '+(resp.ok?'OK':'FAIL '+resp.status));
-if(resp.ok)count++;
+var raw=dec(j.content),x=raw;
+x=x.split('Отзывы игроков о VPN для').join('Отзывы пользователей о VPN для');
+x=x.split('отзывы игроков о VPN для').join('отзывы пользователей о VPN для');
+x=x.split('Для казуальной игры хватает').join('Для обычного использования хватает');
+x=x.split('нарушение правил игры').join('нарушение правил сервиса');
+x=x.split('без лагов и банов').join('без сбоев и ограничений');
+x=x.split('низкий пинг и обход блокировок').join('стабильный доступ и обход блокировок');
+x=x.split('Выбирайте по пингу, скорости и цене').join('Выбирайте по скорости, надёжности и цене');
+x=x.split('Играю в').join('Пользуюсь');
+x=x.split('играет в').join('использует');
+x=x.split('казуал').join('обычное использование');
+x=x.split('низкий пинг для игр').join('стабильное соединение');
+x=x.split('почему он важен для игр').join('почему он важен');
+x=x.split('и других игр').join('и других сервисов');
+if(x===raw){lg(' no changes');continue;}
+lg(' saving...');
+var bd=JSON.stringify({message:'fix2: '+f.name,content:enc(x),branch:'main',sha:j.sha});
+var rp=await fetch('https://api.github.com/repos/'+REPO+'/contents/'+f.name,{method:'PUT',headers:H,body:bd});
+lg(' '+(rp.ok?'OK':'FAIL '+rp.status));
+if(rp.ok)c++;
 await new Promise(function(r){setTimeout(r,400);});
 }
-lg('Done! '+count+' files fixed.');
+lg('Done! '+c+' fixed.');
 }
 </script></body></html>
