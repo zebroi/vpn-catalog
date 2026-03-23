@@ -1,117 +1,116 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix</title></head><body>
 <h2>Fix Pages</h2>
-<input id="tk" placeholder="GitHub Token" style="width:300px;padding:8px"><button onclick="run()">FIX</button>
+<input id="tk" placeholder="GitHub Token" style="width:300px;padding:8px">
+<button onclick="run()">FIX</button>
 <pre id="log"></pre>
 <script>
 const O='zebroi',R='vpn-catalog',B='main';
 const L=document.getElementById('log');
 function log(m){L.textContent+=m+'\n'}
 
-const pages=[
-{f:'vpn-dlya-youtube',t:'YouTube',use:'просмотр YouTube без замедления',faq1q:'Зачем нужен VPN для YouTube?',faq1a:'YouTube замедляется провайдерами в России. VPN обходит ограничения и позволяет смотреть видео в 4K без буферизации.',faq2q:'Какой VPN лучший для YouTube в 2026?',faq2a:'Nony VPN (99 руб/мес) и VPN Гусь (до 500 Мбит/с). Оба обеспечивают стабильный просмотр YouTube в 4K.',r1n:'Алексей К.',r1c:'Москва',r1t:'YouTube перестал тормозить сразу после подключения VPN. Смотрю 4K без единого зависания.',r1s:'Nony VPN',r2n:'Мария Д.',r2c:'Казань',r2t:'VPN Гусь даёт отличную скорость для YouTube. Настроила за минуту через бота в Telegram.',r2s:'VPN Гусь',r3n:'Павел С.',r3c:'СПб',r3t:'Proton VPN бесплатный план для YouTube работает, но скорость ниже. Для HD хватает.',r3s:'Proton VPN'},
-{f:'vpn-dlya-telegram',t:'Telegram',use:'стабильный доступ к Telegram',faq1q:'Зачем нужен VPN для Telegram?',faq1a:'Telegram может быть замедлён или заблокирован. VPN обеспечивает стабильный доступ к мессенджеру, звонкам и каналам.',faq2q:'Какой VPN лучший для Telegram?',faq2a:'Nony VPN и VPN Гусь — оба отлично работают с Telegram. Для бесплатного доступа подойдёт Proton VPN.',r1n:'Ирина В.',r1c:'Москва',r1t:'Telegram работает стабильно через Nony VPN. Звонки не обрываются, файлы качаются быстро.',r1s:'Nony VPN',r2n:'Дмитрий Л.',r2c:'Екатеринбург',r2t:'Настроил VPN Гусь для Telegram — бот выдал ключ за секунду, всё работает.',r2s:'VPN Гусь',r3n:'Елена К.',r3c:'Новосибирск',r3t:'Использую AdGuard VPN для Telegram. Плюс — ещё и рекламу блокирует.',r3s:'AdGuard VPN'},
-{f:'vpn-dlya-instagram',t:'Instagram',use:'доступ к Instagram',faq1q:'Зачем нужен VPN для Instagram?',faq1a:'Instagram заблокирован в России с 2022 года. VPN позволяет обойти блокировку и пользоваться соцсетью.',faq2q:'Какой VPN лучший для Instagram?',faq2a:'Nony VPN (99 руб/мес) — самый доступный. VPN Гусь — максимальная скорость для загрузки фото и видео.',r1n:'Анна М.',r1c:'Москва',r1t:'Instagram через Nony VPN летает — stories грузятся мгновенно. За 99 руб в месяц отличное решение.',r1s:'Nony VPN',r2n:'Ксения Р.',r2c:'Краснодар',r2t:'VPN Гусь для Instagram — скорость супер, reels крутятся без задержек.',r2s:'VPN Гусь',r3n:'Олег Т.',r3c:'СПб',r3t:'ZoogVPN оплатил МИРом, Instagram заработал сразу. Стабильно уже 3 месяца.',r3s:'ZoogVPN'},
-{f:'vpn-dlya-tiktok',t:'TikTok',use:'доступ к TikTok',faq1q:'Зачем нужен VPN для TikTok?',faq1a:'TikTok может быть ограничен в некоторых сетях. VPN обходит замедление и даёт полный доступ к контенту.',faq2q:'Какой VPN лучший для TikTok?',faq2a:'VPN Гусь и Nony VPN обеспечивают быструю загрузку видео TikTok без буферизации.',r1n:'Софья Н.',r1c:'Москва',r1t:'TikTok через VPN Гусь грузится моментально. Рекомендую для тех, кто много смотрит видео.',r1s:'VPN Гусь',r2n:'Артём Б.',r2c:'Казань',r2t:'Nony VPN для TikTok — дёшево и стабильно. 99 руб и всё летает.',r2s:'Nony VPN',r3n:'Лиза П.',r3c:'Екатеринбург',r3t:'Planet VPN бесплатно открывает TikTok. Для просмотра видео хватает.',r3s:'Planet VPN'},
-{f:'vpn-dlya-whatsapp',t:'WhatsApp',use:'звонки и сообщения WhatsApp',faq1q:'Зачем нужен VPN для WhatsApp?',faq1a:'WhatsApp звонки могут блокироваться или замедляться. VPN обеспечивает стабильную связь.',faq2q:'Какой VPN лучший для WhatsApp?',faq2a:'Для звонков важен низкий пинг: Nony VPN и VPN Гусь — лучшие варианты.',r1n:'Наталья Г.',r1c:'Москва',r1t:'WhatsApp звонки через Nony VPN работают отлично. Голос чистый, без обрывов.',r1s:'Nony VPN',r2n:'Сергей Д.',r2c:'СПб',r2t:'VPN Гусь стабильно держит WhatsApp видеозвонки.',r2s:'VPN Гусь',r3n:'Ольга С.',r3c:'Казань',r3t:'AdGuard VPN для WhatsApp — звонки стабильные, плюс реклама блокируется.',r3s:'AdGuard VPN'},
-{f:'vpn-dlya-discord',t:'Discord',use:'голосовой чат Discord',faq1q:'Зачем нужен VPN для Discord?',faq1a:'Discord может быть замедлён. VPN снижает пинг и обеспечивает стабильный голосовой чат.',faq2q:'Какой VPN лучший для Discord?',faq2a:'VPN Гусь (низкий пинг) и Nony VPN — оба отлично работают с голосовым чатом Discord.',r1n:'Максим К.',r1c:'Москва',r1t:'Discord голосовой чат через VPN Гусь — пинг 30 мс, никаких лагов.',r1s:'VPN Гусь',r2n:'Даниил В.',r2c:'Новосибирск',r2t:'Nony VPN для Discord стабильно работает. Стримлю и общаюсь без проблем.',r2s:'Nony VPN',r3n:'Кирилл А.',r3c:'Екатеринбург',r3t:'Proton VPN бесплатно даёт нормальный доступ к Discord.',r3s:'Proton VPN'},
-{f:'vpn-dlya-facebook',t:'Facebook',use:'доступ к Facebook',faq1q:'Зачем нужен VPN для Facebook?',faq1a:'Facebook заблокирован в России. VPN позволяет обойти блокировку.',faq2q:'Какой VPN лучший для Facebook?',faq2a:'Nony VPN и VPN Гусь — быстрые и доступные варианты для Facebook.',r1n:'Елена М.',r1c:'Москва',r1t:'Facebook через Nony VPN работает стабильно.',r1s:'Nony VPN',r2n:'Андрей К.',r2c:'СПб',r2t:'VPN Гусь для Facebook — быстро и удобно.',r2s:'VPN Гусь',r3n:'Татьяна Р.',r3c:'Казань',r3t:'ZoogVPN хорошо работает с Facebook, оплатила МИРом.',r3s:'ZoogVPN'},
-{f:'vpn-dlya-chatgpt',t:'ChatGPT',use:'доступ к ChatGPT',faq1q:'Зачем нужен VPN для ChatGPT?',faq1a:'ChatGPT от OpenAI недоступен из России. VPN с серверами в США или Европе открывает доступ.',faq2q:'Какой VPN лучший для ChatGPT?',faq2a:'VPN Гусь и Nony VPN имеют серверы в нужных странах. Proton VPN бесплатно тоже работает.',r1n:'Игорь Н.',r1c:'Москва',r1t:'ChatGPT через VPN Гусь открывается мгновенно. Использую каждый день для работы.',r1s:'VPN Гусь',r2n:'Алина В.',r2c:'СПб',r2t:'Nony VPN для ChatGPT — стабильный доступ, 99 руб/мес.',r2s:'Nony VPN',r3n:'Роман Д.',r3c:'Екатеринбург',r3t:'Proton VPN бесплатный план открывает ChatGPT.',r3s:'Proton VPN'}
-];
-
-const defaultReview={r1n:'Алексей М.',r1c:'Москва',r1t:'VPN работает стабильно, доволен скоростью и ценой.',r1s:'Nony VPN',r2n:'Мария К.',r2c:'Казань',r2t:'Настройка заняла минуту. Рекомендую VPN Гусь.',r2s:'VPN Гусь',r3n:'Дмитрий С.',r3c:'СПб',r3t:'Proton VPN бесплатный план работает нормально.',r3s:'Proton VPN'};
-const defaultFaq={faq1q:'Зачем нужен VPN для этого сервиса?',faq1a:'VPN обходит блокировки и замедления, обеспечивая стабильный доступ к сервису из России.',faq2q:'Какой VPN лучший в 2026?',faq2a:'Nony VPN (99 руб/мес, 7 дней бесплатно) и VPN Гусь (макс. скорость, бесплатный ключ).'};
-
 const allFiles=[
-'vpn-dlya-youtube','vpn-dlya-telegram','vpn-dlya-instagram','vpn-dlya-tiktok','vpn-dlya-whatsapp','vpn-dlya-discord','vpn-dlya-facebook','vpn-dlya-snapchat','vpn-dlya-vkontakte','vpn-dlya-spotify','vpn-dlya-twitch','vpn-dlya-google-play','vpn-dlya-chatgpt','vpn-dlya-gemini','vpn-dlya-steam','vpn-dlya-soundcloud','vpn-dlya-microsoft-store',
-'vpn-dlya-brawl-stars','vpn-dlya-clash-royale','vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu',
-'vpn-dlya-android','vpn-dlya-iphone','vpn-dlya-windows','vpn-dlya-macos','vpn-dlya-linux','vpn-dlya-pk','vpn-dlya-smart-tv','vpn-dlya-android-tv','vpn-dlya-plansheta','vpn-dlya-samsung','vpn-dlya-huawei','vpn-dlya-xiaomi','vpn-dlya-redmi','vpn-dlya-honor','vpn-dlya-lg',
-'vpn-dlya-yandex-brauzera','vpn-dlya-google-chrome','vpn-dlya-opera','vpn-dlya-edge',
-'vpn-dlya-routera','vpn-dlya-tp-link','vpn-dlya-keenetic','vpn-dlya-xiaomi-routera','vpn-dlya-mts','vpn-dlya-bilajn','vpn-dlya-megafon','vpn-dlya-rostelekom',
-'vpn-v2ray','vpn-vless','vpn-wireguard','vpn-openvpn','vpn-outline','vpn-hiddify','vpn-amnezia','vpn-adguard','vpn-byedpi','vpn-proton','vpn-planet','vpn-hitproxy','vpn-happ','vpn-fkey','vpn-dyadya-vanya',
-'vpn-dlya-rossii','vpn-dlya-kryma','vpn-dlya-kazahstana','vpn-dlya-belarusi','vpn-dlya-kitaya','vpn-dlya-ssha',
-'vpn-obhod-blokirovok','vpn-obhod-belogo-spiska','vpn-obhod-glushilok','vpn-mobilnyj-internet','vpn-dlya-raboty','vpn-dlya-doma','vpn-dlya-torrentov','vpn-smena-regiona','vpn-uskoreniye-interneta','vpn-dlya-igr','vpn-dlya-zvonkov','vpn-razdacha-interneta'
+'vpn-dlya-youtube','vpn-dlya-telegram','vpn-dlya-instagram','vpn-dlya-tiktok','vpn-dlya-whatsapp',
+'vpn-dlya-discord','vpn-dlya-facebook','vpn-dlya-snapchat','vpn-dlya-vkontakte','vpn-dlya-spotify',
+'vpn-dlya-twitch','vpn-dlya-google-play','vpn-dlya-chatgpt','vpn-dlya-gemini','vpn-dlya-steam',
+'vpn-dlya-soundcloud','vpn-dlya-microsoft-store','vpn-dlya-brawl-stars','vpn-dlya-clash-royale',
+'vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta',
+'vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu','vpn-dlya-android','vpn-dlya-iphone',
+'vpn-dlya-windows','vpn-dlya-macos','vpn-dlya-linux','vpn-dlya-pk','vpn-dlya-smart-tv',
+'vpn-dlya-android-tv','vpn-dlya-plansheta','vpn-dlya-samsung','vpn-dlya-huawei','vpn-dlya-xiaomi',
+'vpn-dlya-redmi','vpn-dlya-honor','vpn-dlya-lg','vpn-dlya-yandex-brauzera','vpn-dlya-google-chrome',
+'vpn-dlya-opera','vpn-dlya-edge','vpn-dlya-routera','vpn-dlya-tp-link','vpn-dlya-keenetic',
+'vpn-dlya-xiaomi-routera','vpn-dlya-mts','vpn-dlya-bilajn','vpn-dlya-megafon','vpn-dlya-rostelekom',
+'vpn-v2ray','vpn-vless','vpn-wireguard','vpn-openvpn','vpn-outline','vpn-hiddify','vpn-amnezia',
+'vpn-adguard','vpn-byedpi','vpn-proton','vpn-planet','vpn-hitproxy','vpn-happ','vpn-fkey',
+'vpn-dyadya-vanya','vpn-dlya-rossii','vpn-dlya-kryma','vpn-dlya-kazahstana','vpn-dlya-belarusi',
+'vpn-dlya-kitaya','vpn-dlya-ssha','vpn-obhod-blokirovok','vpn-obhod-belogo-spiska',
+'vpn-obhod-glushilok','vpn-mobilnyj-internet','vpn-dlya-raboty','vpn-dlya-doma',
+'vpn-dlya-torrentov','vpn-smena-regiona','vpn-uskoreniye-interneta','vpn-dlya-igr',
+'vpn-dlya-zvonkov','vpn-razdacha-interneta'
 ];
 
-function getPageData(f){return pages.find(p=>p.f===f)}
+function fixHtml(h,fname){
+  // Remove Roblox artifacts in text
+  h=h.replace(/для игры в /g,'для ');
+  h=h.replace(/игры в [^<,.]{1,50} без лагов/g,'использования VPN');
+  h=h.replace(/игру в [^<,.]{1,50} без лагов/g,'использование VPN');
+  h=h.replace(/на серверах Роблокс/gi,'');
+  h=h.replace(/серверах Роблокс/gi,'серверах');
+  h=h.replace(/низкий пинг на серверах роблокс/gi,'');
+  h=h.replace(/Низкий пинг на серверах Роблокс[^<]*/gi,'');
+  h=h.replace(/Подборка проверенных сервисов для игры в [^<]* без лагов и банов/g,'Подборка проверенных VPN-сервисов для России');
+  h=h.replace(/Сравниваем 35 VPN-сервисов для игры в ([^в][^<]*) в России/g,'Сравниваем 35 VPN-сервисов для $1 в России');
+  h=h.replace(/Играю в Roblox каждый день[^<]*/g,'VPN работает стабильно, скорость отличная.');
+  h=h.replace(/Сын играет в Roblox[^<]*/g,'Пользуемся уже полгода, всё работает без сбоев.');
+  h=h.replace(/Бесплатный Proton для Roblox[^<]*/g,'Proton VPN отлично справляется с задачей.');
+  h=h.replace(/Данил К\./g,'Алексей М.');
+  h=h.replace(/Анна С\./g,'Мария К.');
+  h=h.replace(/Максим В\./g,'Дмитрий С.');
+  h=h.replace(/Зачем нужен VPN для Roblox\?/g,'Зачем нужен VPN?');
+  h=h.replace(/Roblox может быть замедлён[^<]*/g,'VPN обходит блокировки и замедления провайдеров.');
+  h=h.replace(/Какой VPN лучший для Roblox\?/g,'Какой VPN лучший в 2026?');
+  return h;
+}
 
-function fixContent(html,fname){
- let h=html;
- const pd=getPageData(fname);
- const rv=pd||defaultReview;
- const fq=pd||defaultFaq;
- // Fix Roblox artifacts in descriptions
- h=h.replace(/на серверах Роблокс/g,'');
- h=h.replace(/на серверах роблокс/g,'');
- h=h.replace(/серверах Роблокс/g,'серверах');
- h=h.replace(/для игры в YouTube/g,'для просмотра YouTube');
- h=h.replace(/для игры в Telegram/g,'для доступа к Telegram');
- h=h.replace(/для игры в Instagram/g,'для доступа к Instagram');
- h=h.replace(/для игры в /g,'для ');
- h=h.replace(/игры в [^<,.]+ без лагов/g,(pd?pd.use:'использования сервиса'));
- h=h.replace(/игру в [^<,.]+ без лагов/g,(pd?pd.use:'использования сервиса'));
- h=h.replace(/Подборка проверенных сервисов для игры в [^<]+ без лагов и банов/g,'Подборка проверенных VPN-сервисов');
- h=h.replace(/Низкий пинг на серверах Роблокс/g,'');
- // Fix reviews
- if(rv.r1n){
-  h=h.replace(/Данил К\./g,rv.r1n);h=h.replace(/>Москва</,('>'+rv.r1c+'<'));
-  h=h.replace(/Играю в Roblox каждый день[^<]*/g,rv.r1t);h=h.replace(/>Nony VPN<\/div>\s*<p class="rtext">/,('>'+rv.r1s+'</div><p class="rtext">'));
-  h=h.replace(/Анна С\./g,rv.r2n);
-  h=h.replace(/Сын играет в Roblox[^<]*/g,rv.r2t);
-  h=h.replace(/Максим В\./g,rv.r3n);
-  h=h.replace(/Бесплатный Proton для Roblox[^<]*/g,rv.r3t);
- }
- // Fix FAQ
- if(fq.faq1q){
-  h=h.replace(/Зачем нужен VPN для [^?]+\?/,fq.faq1q);
-  h=h.replace(/Roblox может быть замедлён[^<]*/g,fq.faq1a);
-  h=h.replace(/Какой VPN лучший для [^?]+\?/,fq.faq2q);
-  h=h.replace(/Топ-2: <a[^<]*<\/a>[^<]*<a[^<]*<\/a>[^<]*/g,fq.faq2a);
- }
- return h;
+async function fixIndexHtml(tk){
+  log('Fixing index.html...');
+  const f=await getFile(tk,'index.html');
+  if(!f){log(' FAIL');return}
+  let h=f.content;
+  // The CSS and JS are dumped outside style/script tags after footer
+  // Find the pattern: raw CSS right after </footer>
+  if(h.includes('html.light{--bg:#f5f5f0') && !h.includes('<style>html.light')){
+    h=h.replace('html.light{--bg:#f5f5f0','<style>html.light{--bg:#f5f5f0');
+    // Find the end of CSS (before JS function)
+    h=h.replace('const t=localStorage.getItem(','</style><scr'+'ipt>const t=localStorage.getItem(');
+    // Add closing script tag before </body>
+    h=h.replace('</body>','</scr'+'ipt></body>');
+    log(' Fixed CSS/JS wrapping');
+  } else {
+    log(' Already fixed or different structure');
+  }
+  const ok=await putFile(tk,'index.html',h,f.sha,'Fix index.html: wrap CSS/JS in tags');
+  log(ok?' OK':' FAIL');
 }
 
 async function getFile(tk,path){
- const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,{headers:{'Authorization':'token '+tk}});
- if(!r.ok)return null;
- const j=await r.json();
- return {content:atob(j.content.replace(/\n/g,'')),sha:j.sha};
-}
-async function putFile(tk,path,content,sha,msg){
- const b64=btoa(unescape(encodeURIComponent(content)));
- const body={message:msg,content:b64,branch:B,sha:sha};
- const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,{method:'PUT',headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},body:JSON.stringify(body)});
- return r.ok;
+  const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
+    {headers:{'Authorization':'token '+tk}});
+  if(!r.ok)return null;
+  const j=await r.json();
+  return {content:atob(j.content.replace(/\n/g,'')),sha:j.sha};
 }
 
-async function fixIndex(tk){
- log('Fixing index.html...');
- const f=await getFile(tk,'index.html');
- if(!f){log('  FAIL: cannot read');return}
- let h=f.content;
- // Fix: CSS and JS after </footer> need <style> and <script> wrappers
- h=h.replace('html.light{','<style>html.light{');
- h=h.replace('.theme-toggle{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:20px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}','.theme-toggle{position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:20px;cursor:pointer;z-index:999;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}</style><button class="theme-toggle">');
- h=h.replace(/☾if\(/,'</button><script>if(');
- if(!h.includes('</script></body>')){h=h.replace(/'\\\\u263E';/,"'\\\\u263E';</script>")}
- const ok=await putFile(tk,'index.html',h,f.sha,'Fix index.html CSS/JS');
- log(ok?'  OK':'  FAIL');
+async function putFile(tk,path,content,sha,msg){
+  const b64=btoa(unescape(encodeURIComponent(content)));
+  const r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+path,
+    {method:'PUT',headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg,content:b64,branch:B,sha:sha})});
+  return r.ok;
 }
+
+async function fixPage(tk,fname){
+  const f=await getFile(tk,fname+'.html');
+  if(!f){log(' skip (not found)');return}
+  const fixed=fixHtml(f.content,fname);
+  if(fixed===f.content){log(' no changes');return}
+  const ok=await putFile(tk,fname+'.html',fixed,f.sha,'Fix: remove Roblox artifacts');
+  log(ok?' OK':' FAIL');
+}
+
+async function delay(ms){return new Promise(r=>setTimeout(r,ms))}
 
 async function run(){
- const tk=document.getElementById('tk').value.trim();
- if(!tk){log('Enter token!');return}
- await fixIndex(tk);
- for(let i=0;i<allFiles.length;i++){
-  const fn=allFiles[i]+'.html';
-  log('['+(i+1)+'/'+allFiles.length+'] '+fn+'...');
-  const f=await getFile(tk,fn);
-  if(!f){log('  SKIP');continue}
-  const fixed=fixContent(f.content,allFiles[i]);
-  if(fixed===f.content){log('  NO CHANGE');continue}
-  const ok=await putFile(tk,fn,fixed,f.sha,'Fix '+fn);
-  log(ok?'  OK':'  FAIL');
-  await new Promise(r=>setTimeout(r,600));
- }
- log('ALL DONE!');
+  const tk=document.getElementById('tk').value.trim();
+  if(!tk){log('Enter token!');return}
+  log('=== Starting fix ===');
+  await fixIndexHtml(tk);
+  for(let i=0;i<allFiles.length;i++){
+    log('['+(i+1)+'/'+allFiles.length+'] '+allFiles[i]+'...');
+    await fixPage(tk,allFiles[i]);
+    await delay(500);
+  }
+  log('=== ALL DONE ===');
 }
-</script></body></html>
+<\/script>
+</body></html>
