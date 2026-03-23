@@ -6,7 +6,7 @@
 <script>
 var gamePages=['vpn-dlya-roblox','vpn-dlya-brawl-stars','vpn-dlya-clash-royale','vpn-dlya-minecraft','vpn-dlya-pubg-mobile','vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-osu','vpn-dlya-igr'];
 var L=document.getElementById('log');
-function log(s){L.textContent+=s+'\n';L.scrollTop=L.scrollHeight;}
+var raw=decodeURIComponent(escape(atob(j.content.replace(/\n/g,''))));
 async function run(){
 var tk=document.getElementById('tk').value.trim();
 if(!tk){alert('Enter token');return;}
