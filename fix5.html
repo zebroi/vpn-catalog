@@ -1,0 +1,82 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix footer links v5</title></head><body>
+<h2>Fix footer links v5</h2>
+<input id="tk" placeholder="GitHub Token" style="width:400px;padding:8px;margin:8px 0">
+<button onclick="run()">RUN</button>
+<pre id="log" style="background:#111;color:#0f0;padding:16px;margin-top:16px;max-height:500px;overflow:auto"></pre>
+<script>
+var O='zebroi',R='vpn-catalog',B='main';
+var L=document.getElementById('log');
+function log(m){L.textContent+=m+'\n';}
+
+var allfiles=[
+'vpn-dlya-youtube','vpn-dlya-telegram','vpn-dlya-discord','vpn-dlya-facebook',
+'vpn-dlya-twitch','vpn-dlya-google-play','vpn-dlya-microsoft-store',
+'vpn-dlya-soundcloud','vpn-dlya-minecraft','vpn-dlya-pubg-mobile',
+'vpn-dlya-geometry-dash','vpn-dlya-nulls-brawl','vpn-dlya-windows',
+'vpn-dlya-macos','vpn-dlya-linux','vpn-dlya-pk','vpn-dlya-smart-tv',
+'vpn-dlya-android-tv','vpn-dlya-plansheta','vpn-dlya-redmi','vpn-dlya-honor',
+'vpn-dlya-lg','vpn-dlya-opera','vpn-dlya-edge','vpn-dlya-routera',
+'vpn-dlya-xiaomi-routera','vpn-dlya-mts','vpn-dlya-bilajn','vpn-dlya-megafon',
+'vpn-dlya-rostelekom','vpn-v2ray','vpn-vless','vpn-wireguard','vpn-openvpn',
+'vpn-outline','vpn-hiddify','vpn-amnezia','vpn-adguard','vpn-byedpi',
+'vpn-proton','vpn-planet','vpn-hitproxy','vpn-happ','vpn-fkey',
+'vpn-dyadya-vanya','vpn-dlya-rossii','vpn-dlya-kryma','vpn-dlya-kazahstana',
+'vpn-dlya-belarusi','vpn-dlya-kitaya','vpn-dlya-ssha','vpn-obhod-blokirovok',
+'vpn-obhod-belogo-spiska','vpn-obhod-glushilok','vpn-mobilnyj-internet',
+'vpn-dlya-raboty','vpn-dlya-doma','vpn-dlya-torrentov','vpn-smena-regiona',
+'vpn-uskoreniye-interneta','vpn-dlya-igr','vpn-dlya-zvonkov',
+'vpn-razdacha-interneta','vpn-dlya-android','vpn-dlya-iphone',
+'vpn-dlya-instagram','vpn-dlya-tiktok','vpn-dlya-whatsapp','vpn-dlya-snapchat',
+'vpn-dlya-vkontakte','vpn-dlya-spotify','vpn-dlya-steam','vpn-dlya-chatgpt',
+'vpn-dlya-gemini','vpn-dlya-brawl-stars','vpn-dlya-clash-royale',
+'vpn-dlya-free-fire','vpn-dlya-fifa','vpn-dlya-gta','vpn-dlya-osu',
+'vpn-dlya-roblox','vpn-dlya-google-chrome','vpn-dlya-yandex-brauzera',
+'vpn-dlya-tp-link','vpn-dlya-keenetic','vpn-dlya-samsung','vpn-dlya-huawei',
+'vpn-dlya-xiaomi','vpn-dlya-honor','vpn-dlya-redmi'
+];
+
+// Deduplicate
+allfiles=[...new Set(allfiles)];
+
+var pairs=[
+ ['href="/vpn-dlya-routerov"','href="/vpn-dlya-routera"'],
+ ['href="https://vpn-catalog.vercel.app/vpn-dlya-routerov"','href="https://vpn-catalog.vercel.app/vpn-dlya-routera"'],
+ ['href="/besplatnye-vpn"','href="/vpn-dlya-igr"'],
+ ['href="https://vpn-catalog.vercel.app/besplatnye-vpn"','href="https://vpn-catalog.vercel.app/vpn-dlya-igr"']
+];
+
+async function fixFile(name,token){
+ var url='https://api.github.com/repos/'+O+'/'+R+'/contents/'+name+'.html?ref='+B;
+ var r=await fetch(url,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
+ if(!r.ok){log('SKIP '+name+' ('+r.status+')');return false;}
+ var d=await r.json();
+ var content=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+ var orig=content;
+ for(var p of pairs){
+ content=content.split(p[0]).join(p[1]);
+ }
+ if(content===orig){log('NO CHANGE: '+name);return false;}
+ var newContent=btoa(unescape(encodeURIComponent(content)));
+ var wr=await fetch(url,{
+ method:'PUT',
+ headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+ body:JSON.stringify({message:'Fix footer links in '+name,content:newContent,sha:d.sha,branch:B})
+ });
+ if(wr.ok){log('FIXED: '+name);return true;}
+ else{log('ERROR: '+name+' '+wr.status);return false;}
+}
+
+async function run(){
+ var token=document.getElementById('tk').value.trim();
+ if(!token){alert('Enter token!');return;}
+ log('Starting... '+allfiles.length+' files');
+ var fixed=0,skip=0;
+ for(var name of allfiles){
+ var ok=await fixFile(name,token);
+ if(ok)fixed++;else skip++;
+ await new Promise(r=>setTimeout(r,200));
+ }
+ log('DONE! Fixed:'+fixed+' Skipped:'+skip);
+}
+</script>
+</body></html>
