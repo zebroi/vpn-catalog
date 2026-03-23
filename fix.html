@@ -51,7 +51,9 @@ async function getFile(tk,path){
     {headers:{'Authorization':'token '+tk}});
   if(!r.ok)return null;
   var j=await r.json();
-  return {content:atob(j.content.replace(/\n/g,'')),sha:j.sha};
+  var raw=atob(j.content.replace(/\n/g,''));
+  var txt=decodeURIComponent(escape(raw));
+  return {content:txt,sha:j.sha};
 }
 
 async function putFile(tk,path,content,sha,msg){
