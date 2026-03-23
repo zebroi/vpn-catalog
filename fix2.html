@@ -1,0 +1,69 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix Index</title></head><body>
+<h2>Fix index.html</h2>
+<input id="tk" placeholder="GitHub Token" style="width:300px;padding:8px">
+<button onclick="run()">FIX INDEX</button>
+<pre id="log" style="white-space:pre-wrap;word-break:break-all"></pre>
+<script>
+async function run(){
+  var tk=document.getElementById('tk').value.trim();
+  if(!tk){alert('Enter token');return}
+  var log=document.getElementById('log');
+  log.textContent='Reading index.html...\n';
+  
+  var r=await fetch('https://api.github.com/repos/zebroi/vpn-catalog/contents/index.html',
+    {headers:{'Authorization':'token '+tk}});
+  var j=await r.json();
+  var sha=j.sha;
+  var content=atob(j.content.replace(/\n/g,''));
+  
+  log.textContent+='Size: '+content.length+'\n';
+  
+  // Check what's broken
+  var hasStyleTag=content.includes('<style>html.light');
+  var hasScriptTag=content.includes('</button><scr'+'ipt>if(');
+  log.textContent+='Has <style>: '+hasStyleTag+'\n';
+  log.textContent+='Has <script>: '+hasScriptTag+'\n';
+  
+  var fixed=content;
+  
+  // Fix 1: wrap CSS in <style> tag
+  if(!hasStyleTag && fixed.includes('html.light{')){
+    fixed=fixed.replace('html.light{','<style>html.light{');
+    log.textContent+='Added <style> tag\n';
+  }
+  
+  // Fix 2: end style, add button, start script
+  // The pattern is: ...rgba(0,0,0,.2)}☾if(
+  // where ☾ = \u263e
+  var moonChar='\u263e';
+  if(fixed.includes('rgba(0,0,0,.2)}'+moonChar+'if(')){
+    fixed=fixed.replace('rgba(0,0,0,.2)}'+moonChar+'if(',
+      'rgba(0,0,0,.2)}</style><button class="theme-toggle">'+moonChar+'</button><scr'+'ipt>if(');
+    log.textContent+='Fixed button+script wrapping\n';
+  } else if(fixed.includes('rgba(0,0,0,.2)}')){
+    // maybe different structure - log what comes after
+    var idx=fixed.indexOf('rgba(0,0,0,.2)}');
+    log.textContent+='After rgba: ['+fixed.substring(idx,idx+50)+']\n';
+  }
+  
+  // Fix 3: add closing script before </body>
+  if(fixed.includes('</body>') && !fixed.includes('</scr'+'ipt></body>')){
+    fixed=fixed.replace('</body>','</scr'+'ipt></body>');
+    log.textContent+='Added closing script tag\n';
+  }
+  
+  if(fixed===content){
+    log.textContent+='No changes needed or pattern not found\n';
+    return;
+  }
+  
+  var b64=btoa(unescape(encodeURIComponent(fixed)));
+  var resp=await fetch('https://api.github.com/repos/zebroi/vpn-catalog/contents/index.html',
+    {method:'PUT',
+     headers:{'Authorization':'token '+tk,'Content-Type':'application/json'},
+     body:JSON.stringify({message:'Fix index.html: wrap CSS/JS in style/script tags',
+       content:b64,branch:'main',sha:sha})});
+  log.textContent+=(resp.ok?'SUCCESS!':'FAIL: '+resp.status)+'\n';
+}
+<\/script>
+</body></html>
