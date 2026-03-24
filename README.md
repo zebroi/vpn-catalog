@@ -4,4 +4,4 @@ https://vpn-catalog.vercel.app
 
 VPN aggregator
 
- 
+ .
