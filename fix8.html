@@ -1,121 +1,112 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix8 - Redesign index.html</title></head><body>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fix8</title></head><body>
 <h2>Fix8 - Redesign index.html</h2>
-<p>Копирует CSS из vpn-dlya-youtube.html в index.html (единый дизайн)</p>
+<p>CSS from youtube to index</p>
 <input id="tk" placeholder="GitHub Token" style="width:400px;padding:8px;margin:8px 0">
 <button onclick="run()">RUN</button>
 <pre id="log" style="background:#111;color:#0f0;padding:16px;margin-top:16px;max-height:600px;overflow:auto"></pre>
 <script>
-var O='zebroi',R='vpn-catalog',B='main';
+var O='zebroi',R='vpn-catalog',B='main',NL=String.fromCharCode(10);
 var L=document.getElementById('log');
-function log(m){L.textContent+=m+'\n';L.scrollTop=L.scrollHeight;}
+function log(m){L.textContent+=m+NL;L.scrollTop=L.scrollHeight;}
 async function getFile(name,token){
   var url='https://api.github.com/repos/'+O+'/'+R+'/contents/'+name+'?ref='+B;
   var r=await fetch(url,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}});
-  if(!r.ok) return null;
+  if(!r.ok){log('ERR fetch '+name+' '+r.status);return null;}
   var d=await r.json();
-  d.decoded=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+  try{d.decoded=decodeURIComponent(escape(atob(d.content.replace(new RegExp(NL,'g'),''))));}catch(e){log('ERR decode: '+e.message);return null;}
   return d;
 }
 async function putFile(name,content,sha,token,msg){
-  var url='https://api.github.com/repos/'+O+'/'+R+'/contents/'+name+'?ref='+B;
   var enc=btoa(unescape(encodeURIComponent(content)));
-  var r=await fetch(url,{
+  var r=await fetch('https://api.github.com/repos/'+O+'/'+R+'/contents/'+name,{
     method:'PUT',
     headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
     body:JSON.stringify({message:msg,content:enc,sha:sha,branch:B})
   });
+  if(!r.ok){var t=await r.text();log('ERR put: '+r.status+' '+t);}
   return r.ok;
 }
 async function run(){
+  try{
   var token=document.getElementById('tk').value.trim();
   if(!token){alert('Token!');return;}
   log('Loading vpn-dlya-youtube.html...');
   var src=await getFile('vpn-dlya-youtube.html',token);
-  if(!src){log('ERROR: cannot load source');return;}
+  if(!src){log('STOP: no source');return;}
   log('Loading index.html...');
   var idx=await getFile('index.html',token);
-  if(!idx){log('ERROR: cannot load index');return;}
+  if(!idx){log('STOP: no index');return;}
   var srcHtml=src.decoded;
   var idxHtml=idx.decoded;
-  // Extract style block from source
+  log('Source len: '+srcHtml.length+', Index len: '+idxHtml.length);
   var srcStyleStart=srcHtml.indexOf('<style>');
   var srcStyleEnd=srcHtml.indexOf('<'+'/style>');
   var srcStyle=srcHtml.substring(srcStyleStart,srcStyleEnd+8);
-  // Extract font links
+  log('Source CSS: '+srcStyle.length+' chars');
   var fontLinks='';
   var re=/<link[^>]*fonts[^>]*>/g;
   var m;
-  while(m=re.exec(srcHtml)){ fontLinks+=m[0]; }
-  log('Source CSS: '+srcStyle.length+' chars');
+  while(m=re.exec(srcHtml)){fontLinks+=m[0];}
   log('Font links: '+fontLinks.length+' chars');
   var newHtml=idxHtml;
-  // Replace style block
-  var oldStyleStart=newHtml.indexOf('<style>');
-  var oldStyleEnd=newHtml.indexOf('<'+'/style>');
-  if(oldStyleStart!==-1 && oldStyleEnd!==-1){
-    newHtml=newHtml.substring(0,oldStyleStart)+srcStyle+newHtml.substring(oldStyleEnd+8);
-    log('Replaced style block');
+  var oldSS=newHtml.indexOf('<style>');
+  var oldSE=newHtml.indexOf('<'+'/style>');
+  if(oldSS!==-1&&oldSE!==-1){
+    newHtml=newHtml.substring(0,oldSS)+srcStyle+newHtml.substring(oldSE+8);
+    log('Replaced style');
   }
-  // Add font links before <style>
-  var stylePos=newHtml.indexOf('<style>');
-  if(stylePos!==-1 && fontLinks){
-    newHtml=newHtml.substring(0,stylePos)+fontLinks+newHtml.substring(stylePos);
-    log('Added font links');
+  var sp=newHtml.indexOf('<style>');
+  if(sp!==-1&&fontLinks){
+    newHtml=newHtml.substring(0,sp)+fontLinks+newHtml.substring(sp);
+    log('Added fonts');
   }
-  // Add data-theme
   newHtml=newHtml.replace('<html lang="ru">','<html lang="ru" data-theme="light">');
   log('Added data-theme');
-  // Replace header with nav
-  var oldHeaderStart=newHtml.indexOf('<header>');
-  var oldHeaderEnd=newHtml.indexOf('<'+'/header>');
-  if(oldHeaderStart!==-1 && oldHeaderEnd!==-1){
-    var newNav='<div class="nav"><div class="container"><div class="nav-in">'+'<a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="700" fill="currentColor">\u0410</text></svg>VPN\u0431\u0430\u0437\u0430</a>'+'<div class="nacts"><button class="thbtn" data-theme-toggle>\u263d</button></div>'+'</div></div></div>';
-    newHtml=newHtml.substring(0,oldHeaderStart)+newNav+newHtml.substring(oldHeaderEnd+9);
-    log('Replaced header with nav');
+  var ohs=newHtml.indexOf('<header>');
+  var ohe=newHtml.indexOf('<'+'/header>');
+  if(ohs!==-1&&ohe!==-1){
+    var nav='<div class="nav"><div class="container"><div class="nav-in">';
+    nav+='<a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="6"/><text x="50" y="62" text-anchor="middle" font-size="36" font-weight="700" fill="currentColor">';
+    nav+=String.fromCharCode(1040);
+    nav+='</text></svg>VPN';
+    nav+=String.fromCharCode(1073,1072,1079,1072);
+    nav+='</a><div class="nacts"><button class="thbtn" data-theme-toggle>';
+    nav+=String.fromCharCode(9789);
+    nav+='</button></div></div></div></div>';
+    newHtml=newHtml.substring(0,ohs)+nav+newHtml.substring(ohe+9);
+    log('Replaced header');
   }
-  // Replace footer
-  var oldFooterStart=newHtml.indexOf('<footer>');
-  var oldFooterEnd=newHtml.indexOf('<'+'/footer>');
-  if(oldFooterStart!==-1 && oldFooterEnd!==-1){
-    var srcFooterStart=srcHtml.indexOf('<footer');
-    var srcFooterEnd=srcHtml.indexOf('<'+'/footer>');
-    if(srcFooterStart!==-1 && srcFooterEnd!==-1){
-      var srcFooter=srcHtml.substring(srcFooterStart,srcFooterEnd+9);
-      newHtml=newHtml.substring(0,oldFooterStart)+srcFooter+newHtml.substring(oldFooterEnd+9);
+  var ofs=newHtml.indexOf('<footer>');
+  var ofe=newHtml.indexOf('<'+'/footer>');
+  if(ofs!==-1&&ofe!==-1){
+    var sfs=srcHtml.indexOf('<footer');
+    var sfe=srcHtml.indexOf('<'+'/footer>');
+    if(sfs!==-1&&sfe!==-1){
+      newHtml=newHtml.substring(0,ofs)+srcHtml.substring(sfs,sfe+9)+newHtml.substring(ofe+9);
       log('Replaced footer');
     }
   }
-  // Add index-specific CSS
-  var indexCSS='<style>'+'.hero{padding:var(--s10) 0 var(--s8);background:linear-gradient(180deg,var(--surf) 0%,var(--bg) 100%);border-bottom:1px solid var(--border);text-align:center}'+'.hero h1{font-family:Manrope,sans-serif;font-size:var(--t2xl);font-weight:800;margin-bottom:var(--s3)}'+'.hero h1 span{color:var(--pri)}'+'.hero p{font-size:var(--tsm);color:var(--muted);max-width:600px;margin:0 auto var(--s6)}'+'.hero-stats{display:flex;justify-content:center;gap:var(--s4);flex-wrap:wrap}'+'.hero-stats div{background:var(--surf);border:1px solid var(--border);border-radius:var(--rlg);padding:var(--s3) var(--s5)}'+'.hero-stats strong{display:block;font-size:1.2rem;color:var(--pri)}'+'.hero-stats span{font-size:.75rem;color:var(--muted)}'+'.section{padding:var(--s12) 0}'+'.section-title{font-family:Manrope,sans-serif;font-size:var(--txl);font-weight:700;margin-bottom:var(--s2)}'+'.section-sub{color:var(--muted);margin-bottom:var(--s6);font-size:var(--tsm)}'+'.cat-label{display:inline-flex;align-items:center;gap:var(--s1);background:var(--surf2);color:var(--muted);padding:.2rem .7rem;border-radius:999px;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--s3);border:1px solid var(--border)}'+'.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s4)}'+'.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rlg);padding:var(--s5);transition:box-shadow .2s,transform .2s;text-decoration:none;color:var(--text);display:block}'+'.card:hover{box-shadow:var(--shadowlg);transform:translateY(-2px);color:var(--text)}'+'.card-icon{font-size:28px;margin-bottom:var(--s2)}'+'.card h3{font-family:Manrope,sans-serif;font-size:1rem;font-weight:700;margin-bottom:.3rem}'+'.card p{font-size:.8rem;color:var(--muted);margin-bottom:var(--s2)}'+'.card-meta{font-size:.75rem;color:var(--muted)}.card-meta span{background:var(--priacc);color:var(--pri);padding:2px 8px;border-radius:999px;margin-right:4px;font-weight:500}'+'.top-banner{background:linear-gradient(135deg,color-mix(in oklab,var(--pri) 8%,var(--surf)),var(--surf));border:1px solid var(--pri);border-radius:var(--rxl);padding:var(--s6);margin-bottom:var(--s8);display:flex;gap:var(--s5);flex-wrap:wrap;align-items:center}'+'.top-banner h3{font-family:Manrope,sans-serif;font-size:1.1rem;font-weight:700}.top-banner p{color:var(--muted);font-size:.85rem}'+'.top-banner .btn{background:var(--pri);color:#fff;padding:.5rem 1.2rem;border-radius:var(--r);font-weight:600;display:inline-block;margin-top:.5rem;font-size:.85rem;text-decoration:none;margin-right:var(--s2)}.top-banner .btn:hover{background:var(--prih);color:#fff}'+'.top-banner .btno{border:1.5px solid var(--pri);color:var(--pri);padding:.45rem 1.1rem;border-radius:var(--r);font-weight:600;display:inline-block;margin-top:.5rem;font-size:.85rem;text-decoration:none}.top-banner .btno:hover{background:var(--pri);color:#fff}'+'@media(max-width:768px){.grid{grid-template-columns:1fr}.top-banner{flex-direction:column}}'+'<'+'/style>';
-  var headEnd=newHtml.indexOf('<'+'/head>');
-  newHtml=newHtml.substring(0,headEnd)+indexCSS+newHtml.substring(headEnd);
+  var iCSS='<style>.hero{padding:var(--s10) 0 var(--s8);background:linear-gradient(180deg,var(--surf) 0%,var(--bg) 100%);border-bottom:1px solid var(--border);text-align:center}.hero h1{font-family:Manrope,sans-serif;font-size:var(--t2xl);font-weight:800;margin-bottom:var(--s3)}.hero h1 span{color:var(--pri)}.hero p{font-size:var(--tsm);color:var(--muted);max-width:600px;margin:0 auto var(--s6)}.hero-stats{display:flex;justify-content:center;gap:var(--s4);flex-wrap:wrap}.hero-stats div{background:var(--surf);border:1px solid var(--border);border-radius:var(--rlg);padding:var(--s3) var(--s5)}.hero-stats strong{display:block;font-size:1.2rem;color:var(--pri)}.hero-stats span{font-size:.75rem;color:var(--muted)}.section{padding:var(--s12) 0}.section-title{font-family:Manrope,sans-serif;font-size:var(--txl);font-weight:700;margin-bottom:var(--s2)}.section-sub{color:var(--muted);margin-bottom:var(--s6);font-size:var(--tsm)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s4)}.card{background:var(--surf);border:1px solid var(--border);border-radius:var(--rlg);padding:var(--s5);transition:box-shadow .2s,transform .2s;text-decoration:none;color:var(--text);display:block}.card:hover{box-shadow:var(--shadowlg);transform:translateY(-2px)}.card h3{font-family:Manrope,sans-serif;font-size:1rem;font-weight:700;margin-bottom:.3rem}.card p{font-size:.8rem;color:var(--muted);margin-bottom:var(--s2)}@media(max-width:768px){.grid{grid-template-columns:1fr}}<'+'/style>';
+  var he=newHtml.indexOf('<'+'/head>');
+  newHtml=newHtml.substring(0,he)+iCSS+newHtml.substring(he);
   log('Added index CSS');
-  // Remove old theme toggle button
-  newHtml=newHtml.replace(/<button class="theme-toggle"[^<]*<\/button>/g,'');
-  // Add theme toggle script from source
-  var srcScriptStart=srcHtml.indexOf('(function(){var t=');
-  if(srcScriptStart===-1) srcScriptStart=srcHtml.indexOf('(function(){var t=document');
-  if(srcScriptStart!==-1){
-    var srcScriptEnd=srcHtml.indexOf('})();',srcScriptStart);
-    if(srcScriptEnd!==-1){
-      var themeScript=srcHtml.substring(srcScriptStart,srcScriptEnd+5);
-      var bodyEnd=newHtml.indexOf('<'+'/body>');
-      if(bodyEnd!==-1){
-        newHtml=newHtml.substring(0,bodyEnd)+'<scr'+'ipt>'+themeScript+'<'+'/scr'+'ipt>'+newHtml.substring(bodyEnd);
-        log('Added theme toggle script');
+  var ss2=srcHtml.indexOf('(function(){var t=');
+  if(ss2!==-1){
+    var se2=srcHtml.indexOf('})();',ss2);
+    if(se2!==-1){
+      var ts=srcHtml.substring(ss2,se2+5);
+      var be=newHtml.indexOf('<'+'/body>');
+      if(be!==-1){
+        newHtml=newHtml.substring(0,be)+'<scr'+'ipt>'+ts+'<'+'/scr'+'ipt>'+newHtml.substring(be);
+        log('Added theme script');
       }
     }
   }
-  // Remove old inline script
-  var oldScriptMatch=newHtml.match(/if\(localStorage\.getItem.*?\u263E';/s);
-  if(oldScriptMatch){
-    newHtml=newHtml.replace(oldScriptMatch[0],'');
-    log('Removed old theme script');
-  }
-  log('New index.html: '+newHtml.length+' chars');
+  log('Result: '+newHtml.length+' chars');
   log('Saving...');
-  var ok=await putFile('index.html',newHtml,idx.sha,token,'Redesign index.html to match inner pages');
-  if(ok) log('SUCCESS! index.html updated.');
-  else log('ERROR saving index.html');
+  var ok=await putFile('index.html',newHtml,idx.sha,token,'Redesign index');
+  if(ok)log('SUCCESS!');
+  else log('FAILED');
+  }catch(e){log('ERROR: '+e.message);}
 }
 </'+'script></body></html>
